@@ -31,6 +31,12 @@ const Navbar = () => {
           >
             Help Center
           </Link>
+          <Link
+            to="/signup"
+            className="hover:text-yellow-300 transition-colors duration-300"
+          >
+            Sign Up
+          </Link>
         </div>
       </div>
     </nav>

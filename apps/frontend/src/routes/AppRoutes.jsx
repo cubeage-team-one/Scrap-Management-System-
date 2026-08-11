@@ -19,6 +19,14 @@ import SuperAdminDashboard from "../pages/superAdmin/SuperAdminDashboard";
 import Industries from "../pages/superAdmin/Industries";
 import Dealers from "../pages/superAdmin/Dealers";
 import Buyers from "../pages/superAdmin/Buyers";
+import ScrapCategories from "../pages/superAdmin/ScrapCategories";
+import Marketplace from "../pages/superAdmin/Marketplace";
+import Auctions from "../pages/superAdmin/Auctions";
+import Reports from "../pages/superAdmin/Reports";
+import Notifications from "../pages/superAdmin/Notifications";
+import Settings from "../pages/superAdmin/Settings";
+
+
 
 // Industry
 import IndustryDashboard from "../pages/industry/IndustryDashboard";
@@ -74,6 +82,41 @@ const AppRoutes = () => {
           <Route
             path={RoutePath.ADMIN_BUYERS}
             element={<Buyers />}
+          />
+
+          <Route
+            path={RoutePath.ADMIN_SCRAP_CATEGORIES}
+            element={<ScrapCategories />}
+          />
+
+           <Route
+            path={RoutePath.ADMIN_MARKETPLACE}
+            element={<Marketplace/>}
+          />
+
+          <Route
+            path={RoutePath.ADMIN_AUCTIONS}
+            element={<Auctions/>}
+          />
+
+          <Route
+            path={RoutePath.ADMIN_REPORTS}
+            element={<Reports/>}
+          />
+
+          <Route
+            path={RoutePath.ADMIN_NOTIFICATIONS}
+            element={<Notifications/>}
+          />
+
+          <Route
+            path={RoutePath.ADMIN_NOTIFICATIONS}
+            element={<Notifications/>}
+          />
+
+          <Route
+            path={RoutePath.ADMIN_SETTINGS}
+            element={<Settings/>}
           />
         </Route>
 

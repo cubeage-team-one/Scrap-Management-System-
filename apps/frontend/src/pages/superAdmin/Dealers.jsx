@@ -1,7 +1,7 @@
 const Dealers = () => {
   return (
     <div>
-      
+      sdfghjkl;
     </div>
   )
 }

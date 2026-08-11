@@ -31,8 +31,13 @@ class RoutePath {
 
   static ADMIN_SCRAP = `${this.SUPER_ADMIN_BASE}/scrap`;
   static ADMIN_CATEGORIES = `${this.SUPER_ADMIN_BASE}/categories`;
+  static ADMIN_SCRAP_CATEGORIES = `${this.SUPER_ADMIN_BASE}/scrap-categories`;
+
+  static ADMIN_MARKETPLACE = `${this.SUPER_ADMIN_BASE}/marketplace`;
 
   static ADMIN_AUCTIONS = `${this.SUPER_ADMIN_BASE}/auctions`;
+
+  static ADMIN_NOTIFICATIONS = `${this.SUPER_ADMIN_BASE}/notifications`;
 
   static ADMIN_TRANSPORT = `${this.SUPER_ADMIN_BASE}/transport`;
 
@@ -51,6 +56,8 @@ class RoutePath {
   static INDUSTRY_DASHBOARD = `${this.INDUSTRY_BASE}/dashboard`;
 
   static INDUSTRY_MY_SCRAP = `${this.INDUSTRY_BASE}/scrap`;
+
+  static INDUSTRY_DEALER_MARKETPLACE = `${this.INDUSTRY_BASE}/dealer-marketplace`;
 
   static INDUSTRY_ADD_SCRAP = `${this.INDUSTRY_BASE}/scrap/add`;
 

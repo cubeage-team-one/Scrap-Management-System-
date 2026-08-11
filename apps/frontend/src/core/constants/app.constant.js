@@ -1,10 +1,10 @@
 // export const APP_NAME = 'Scrap Management System';
 
 export const USER_ROLES = {
-  SUPER_ADMIN: 'superAdmin',
-  INDUSTRY: 'industry',
-  DEALER: 'dealer',
-  BUYER: 'buyer',
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  INDUSTRY: 'INDUSTRY',
+  DEALER: 'DEALER',
+  BUYER: 'BUYER',
 };
 
 export const STORAGE_KEYS = {
