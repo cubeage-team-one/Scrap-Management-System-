@@ -11,6 +11,7 @@ class RoutePath {
   // ==================== PUBLIC ROUTES ====================
   static HOME = "/";
   static ABOUT = "/about";
+  static HELP_CENTER = "/help-center";
   static CONTACT = "/contact";
   static LOGIN = "/login";
   static SIGNUP = "/signup";
@@ -50,12 +51,14 @@ class RoutePath {
   static ADMIN_PROFILE = `${this.SUPER_ADMIN_BASE}/profile`;
 
   // ======================================================
-  // INDUSTRY
+  // INDUSTRY 
   // ======================================================
 
   static INDUSTRY_DASHBOARD = `${this.INDUSTRY_BASE}/dashboard`;
 
   static INDUSTRY_MY_SCRAP = `${this.INDUSTRY_BASE}/scrap`;
+
+  static INDUSTRY_INVENTORY = `${this.INDUSTRY_BASE}/inventory`;
 
   static INDUSTRY_DEALER_MARKETPLACE = `${this.INDUSTRY_BASE}/dealer-marketplace`;
 
@@ -65,13 +68,21 @@ class RoutePath {
 
   static INDUSTRY_AUCTIONS = `${this.INDUSTRY_BASE}/auctions`;
 
+  static INDUSTRY_QUOTATIONS = `${this.INDUSTRY_BASE}/quotations`;
+
+  static INDUSTRY_SALES_ORDERS = `${this.INDUSTRY_BASE}/sales-orders`;
+
+  static INDUSTRY_REPORTS = `${this.INDUSTRY_BASE}/reports`;
+
+  static INDUSTRY_NOTIFICATIONS = `${this.INDUSTRY_BASE}/notifications`;
+
+  static INDUSTRY_SETTINGS = `${this.INDUSTRY_BASE}/settings`;
+
   static INDUSTRY_ORDERS = `${this.INDUSTRY_BASE}/orders`;
 
   static INDUSTRY_TRANSPORT = `${this.INDUSTRY_BASE}/transport`;
 
   static INDUSTRY_PAYMENTS = `${this.INDUSTRY_BASE}/payments`;
-
-  static INDUSTRY_REPORTS = `${this.INDUSTRY_BASE}/reports`;
 
   static INDUSTRY_PROFILE = `${this.INDUSTRY_BASE}/profile`;
 
@@ -112,6 +123,8 @@ class RoutePath {
   static BUYER_PAYMENTS = `${this.BUYER_BASE}/payments`;
 
   static BUYER_PROFILE = `${this.BUYER_BASE}/profile`;
+
+  static BUYER_REPORTS = `${this.BUYER_BASE}/reports`;
 
   // ======================================================
   // COMMON

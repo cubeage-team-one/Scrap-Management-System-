@@ -13,6 +13,8 @@ import About from "../pages/public/About";
 import Contact from "../pages/public/Contact";
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
+import HelpCenter from "../pages/public/HelpCenter";
+
 
 // Super Admin
 import SuperAdminDashboard from "../pages/superAdmin/SuperAdminDashboard";
@@ -30,12 +32,16 @@ import Settings from "../pages/superAdmin/Settings";
 
 // Industry
 import IndustryDashboard from "../pages/industry/IndustryDashboard";
+import MyScrap from "../pages/industry/MyScrap";
+import Inventory from "../pages/industry/IndustryInventory";
+
 
 // Dealer
 import DealerDashboard from "../pages/dealer/DealerDashboard";
 
 // Buyer
 import BuyerDashboard from "../pages/buyer/BuyerDashboard";
+import Buyer from "../pages/buyer/Reports";
 
 const AppRoutes = () => {
   return (
@@ -49,6 +55,8 @@ const AppRoutes = () => {
         <Route path={RoutePath.CONTACT} element={<Contact />} />
         <Route path={RoutePath.LOGIN} element={<Login />} />
         <Route path={RoutePath.SIGNUP} element={<Signup />} />
+        <Route path={RoutePath.HELP_CENTER} element={<HelpCenter />} />
+
       </Route>
 
       {/* ================= DASHBOARD LAYOUT ================= */}
@@ -133,6 +141,19 @@ const AppRoutes = () => {
             path={RoutePath.INDUSTRY_DASHBOARD}
             element={<IndustryDashboard />}
           />
+
+           <Route
+            path={RoutePath.INDUSTRY_MY_SCRAP}
+            element={<MyScrap />} 
+          />
+
+          <Route
+            path={RoutePath.INDUSTRY_INVENTORY}
+            element={<Inventory />} 
+          />
+
+
+
         </Route>
 
         {/* ================= DEALER ================= */}
@@ -162,6 +183,11 @@ const AppRoutes = () => {
           <Route
             path={RoutePath.BUYER_DASHBOARD}
             element={<BuyerDashboard />}
+          />
+
+           <Route
+            path={RoutePath.BUYER_REPORTS}
+            element={<Reports/>}
           />
         </Route>
 

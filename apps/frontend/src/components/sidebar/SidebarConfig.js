@@ -75,9 +75,48 @@ export const sidebarMenus = {
       path: RoutePath.INDUSTRY_MY_SCRAP,
     },
     {
+      label: "Inventory",
+      icon: Package,
+      path: RoutePath.INDUSTRY_INVENTORY,
+    },
+    {
       label: "Dealer Marketplace",
       icon: Package,
       path: RoutePath.INDUSTRY_DEALER_MARKETPLACE,
+    },
+    {
+      label: "Auctions",
+      icon: Package,
+      path: RoutePath.INDUSTRY_AUCTIONS,
+    },
+    {
+      label: "Quotations",
+      icon: Package,
+      path: RoutePath.INDUSTRY_QUOTATIONS,
+    },
+
+    {
+      label: "Sales Orders",
+      icon: Package,
+      path: RoutePath.INDUSTRY_SALES_ORDERS,
+    },
+
+    {
+      label: "Reports",
+      icon: Package,
+      path: RoutePath.INDUSTRY_REPORTS,
+    },
+
+    {
+      label: "Notifications",
+      icon: Package,
+      path: RoutePath.INDUSTRY_NOTIFICATIONS,
+    },
+
+    {
+      label: "Settings",
+      icon: Package,
+      path: RoutePath.INDUSTRY_SETTINGS,
     },
   ],
 
@@ -104,6 +143,11 @@ export const sidebarMenus = {
       label: "Marketplace",
       icon: ShoppingCart,
       path: RoutePath.BUYER_MARKETPLACE,
+    },
+    {
+      label: "Reports",
+      icon: ShoppingCart,
+      path: RoutePath.BUYER_REPORTS,
     },
   ],
 };
