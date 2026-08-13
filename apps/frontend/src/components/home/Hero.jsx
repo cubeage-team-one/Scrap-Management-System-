@@ -39,12 +39,12 @@ const Hero = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap items-center gap-4 mb-12">
-              <button className="px-8 py-4 rounded-xl bg-[#F59E0B] text-[#111827] font-semibold flex items-center gap-2 hover:bg-[#F59E0B]/90 transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)]">
+              <a href="/signup" className="px-8 py-4 rounded-xl bg-[#F59E0B] text-[#111827] font-semibold flex items-center gap-2 hover:bg-[#F59E0B]/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F59E0B] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011C6B] transition-all hover:-translate-y-0.5 active:scale-95 shadow-[0_0_20px_rgba(245,158,11,0.3)] w-fit">
                 Start Free Trial <ArrowRight className="w-5 h-5" />
-              </button>
-              <button className="px-8 py-4 rounded-xl border border-white/20 font-semibold flex items-center gap-2 hover:bg-white/10 transition-colors">
+              </a>
+              <a href="/signup" className="px-8 py-4 rounded-xl border border-white/20 font-semibold flex items-center gap-2 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#011C6B] transition-all hover:-translate-y-0.5 active:scale-95 w-fit">
                 <Play className="w-5 h-5 fill-current" /> Watch Demo
-              </button>
+              </a>
             </div>
 
             {/* Social Proof */}
