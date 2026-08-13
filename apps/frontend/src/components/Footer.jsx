@@ -88,6 +88,8 @@ const Footer = () => {
           {/* Brand Info & Ratings (5 Columns) */}
           <div className="md:col-span-12 lg:col-span-5 space-y-4 pr-0 lg:pr-8">
           
+
+          
               <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center">
                 SmartScrap AI
               </h3>
