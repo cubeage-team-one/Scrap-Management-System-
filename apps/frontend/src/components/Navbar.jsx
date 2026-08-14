@@ -32,6 +32,12 @@ const Navbar = () => {
         {/* Action Buttons */}
         <div className="flex items-center gap-4">
           <Link
+            to="/admin/dashboard"
+            className="text-sm font-medium text-gray-300 hover:text-white mr-2"
+          >
+            Super Admin
+          </Link>
+          <Link
             to="/login"
             className="px-5 py-2.5 rounded-lg border border-white/20 text-sm font-semibold hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#011C6B] transition-all hover:-translate-y-0.5 active:scale-95"
           >
