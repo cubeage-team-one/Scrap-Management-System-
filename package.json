@@ -9,7 +9,7 @@
   ],
   "main": "index.js",
   "scripts": {
-     "frontend": "npm run dev --workspace=frontend",
+    "frontend": "npm run dev --workspace=frontend",
     "backend": "npm run dev --workspace=backend"
   },
   "keywords": [],
@@ -17,5 +17,8 @@
   "license": "ISC",
   "devDependencies": {
     "turbo": "^2.10.7"
+  },
+  "dependencies": {
+    "recharts": "^3.10.1"
   }
 }
