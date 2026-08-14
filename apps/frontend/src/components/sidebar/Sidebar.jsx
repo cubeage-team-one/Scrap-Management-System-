@@ -20,8 +20,8 @@ const Sidebar = () => {
   const menus = sidebarMenus[role] || [];
 
   return (
-    <aside className="w-72 min-h-screen bg-slate-900 text-white">
-      <div className="h-20 flex items-center justify-center border-b border-slate-700">
+    <aside className="w-72 min-h-screen bg-brand text-brand-foreground">
+      <div className="h-20 flex items-center justify-center border-b border-brand-foreground/10">
         <h1 className="text-2xl font-bold">
           Smart Scrap
         </h1>
@@ -35,8 +35,8 @@ const Sidebar = () => {
             className={({ isActive }) =>
               `flex items-center gap-3 p-3 rounded-lg mb-2 ${
                 isActive
-                  ? "bg-green-600"
-                  : "hover:bg-slate-800"
+                  ? "bg-success"
+                  : "hover:bg-brand-foreground/10"
               }`
             }
           >

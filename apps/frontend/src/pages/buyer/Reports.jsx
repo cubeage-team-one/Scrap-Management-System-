@@ -1,9 +1,7 @@
-import React from 'react'
-
 const Reports = () => {
   return (
     <div>
-      asdf
+      buyer report page
     </div>
   )
 }
