@@ -30,6 +30,7 @@ import Settings from "../pages/superAdmin/Settings";
 
 // Industry
 import IndustryDashboard from "../pages/industry/IndustryDashboard";
+import MyScrap from "../pages/industry/MyScrap";
 
 // Dealer
 import DealerDashboard from "../pages/dealer/DealerDashboard";
@@ -110,11 +111,6 @@ const AppRoutes = () => {
           />
 
           <Route
-            path={RoutePath.ADMIN_NOTIFICATIONS}
-            element={<Notifications/>}
-          />
-
-          <Route
             path={RoutePath.ADMIN_SETTINGS}
             element={<Settings/>}
           />
@@ -132,6 +128,11 @@ const AppRoutes = () => {
           <Route
             path={RoutePath.INDUSTRY_DASHBOARD}
             element={<IndustryDashboard />}
+          />
+
+          <Route
+            path={RoutePath.INDUSTRY_MY_SCRAP}
+            element={<MyScrap />}
           />
         </Route>
 
