@@ -1,7 +1,7 @@
 const Reports = () => {
   return (
     <div>
-      sdfghjkl
+        ADMIN REPORTS
     </div>
   )
 }

@@ -35,7 +35,7 @@ import IndustryDashboard from "../pages/industry/IndustryDashboard";
 import MyScrap from "../pages/industry/MyScrap";
 import IndustryInventory from "../pages/industry/IndustryInventory";
 import IndustrySettings from "../pages/industry/Settings";
-
+// import IndustryReports from "../pages/industry/Reports";
 
 // Dealer
 import DealerDashboard from "../pages/dealer/DealerDashboard";
@@ -44,6 +44,7 @@ import DealerProfile from "../pages/dealer/Profile";
 // Buyer
 import BuyerDashboard from "../pages/buyer/BuyerDashboard";
 import BuyerProfile from "../pages/buyer/Profile";
+import BuyerReports from "../pages/buyer/BuyerReports";
 
 const AppRoutes = () => {
   return (
@@ -192,7 +193,7 @@ const AppRoutes = () => {
 
            <Route
             path={RoutePath.BUYER_REPORTS}
-            element={<Reports/>}
+            element={<BuyerReports/>}
           />
 
           <Route
