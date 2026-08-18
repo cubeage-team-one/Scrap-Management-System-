@@ -7,6 +7,13 @@ export const USER_ROLES = {
   BUYER: 'BUYER',
 };
 
+export const ROLE_LABELS = {
+  [USER_ROLES.SUPER_ADMIN]: 'Super Admin',
+  [USER_ROLES.INDUSTRY]: 'Industry',
+  [USER_ROLES.DEALER]: 'Dealer',
+  [USER_ROLES.BUYER]: 'Buyer',
+};
+
 export const STORAGE_KEYS = {
   AUTH_TOKEN: 'sms_auth_token',
   AUTH_USER: 'sms_auth_user',

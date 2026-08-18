@@ -1,7 +1,6 @@
 import { create } from "zustand";
 
 import {
-  getStoredUser,
   setStoredUser,
   setToken,
   clearSession,

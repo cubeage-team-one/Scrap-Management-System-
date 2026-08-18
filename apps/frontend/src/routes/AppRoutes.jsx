@@ -33,15 +33,17 @@ import Settings from "../pages/superAdmin/Settings";
 // Industry
 import IndustryDashboard from "../pages/industry/IndustryDashboard";
 import MyScrap from "../pages/industry/MyScrap";
-import Inventory from "../pages/industry/IndustryInventory";
+import IndustryInventory from "../pages/industry/IndustryInventory";
+import IndustrySettings from "../pages/industry/Settings";
 
 
 // Dealer
 import DealerDashboard from "../pages/dealer/DealerDashboard";
+import DealerProfile from "../pages/dealer/Profile";
 
 // Buyer
 import BuyerDashboard from "../pages/buyer/BuyerDashboard";
-import Buyer from "../pages/buyer/Reports";
+import BuyerProfile from "../pages/buyer/Profile";
 
 const AppRoutes = () => {
   return (
@@ -118,11 +120,6 @@ const AppRoutes = () => {
           />
 
           <Route
-            path={RoutePath.ADMIN_NOTIFICATIONS}
-            element={<Notifications/>}
-          />
-
-          <Route
             path={RoutePath.ADMIN_SETTINGS}
             element={<Settings/>}
           />
@@ -149,10 +146,13 @@ const AppRoutes = () => {
 
           <Route
             path={RoutePath.INDUSTRY_INVENTORY}
-            element={<Inventory />} 
+            element={<IndustryInventory />}
           />
 
-
+          <Route
+            path={RoutePath.INDUSTRY_SETTINGS}
+            element={<IndustrySettings />}
+          />
 
         </Route>
 
@@ -168,6 +168,11 @@ const AppRoutes = () => {
           <Route
             path={RoutePath.DEALER_DASHBOARD}
             element={<DealerDashboard />}
+          />
+
+          <Route
+            path={RoutePath.DEALER_PROFILE}
+            element={<DealerProfile />}
           />
         </Route>
 
@@ -188,6 +193,11 @@ const AppRoutes = () => {
            <Route
             path={RoutePath.BUYER_REPORTS}
             element={<Reports/>}
+          />
+
+          <Route
+            path={RoutePath.BUYER_PROFILE}
+            element={<BuyerProfile />}
           />
         </Route>
 
