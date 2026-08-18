@@ -35,7 +35,7 @@ const INITIAL_FORM = {
 };
 
 const inputStyle =
-  "h-11 w-full rounded-lg border border-[#D9E1EC] bg-[#F9FAFC] px-4 text-sm outline-none focus:border-[#123B73] focus:bg-white focus:ring-2 focus:ring-blue-100";
+  "h-11 w-full rounded-lg border border-border bg-surface-muted px-4 text-sm outline-none focus:border-brand focus:bg-white focus:ring-2 focus:ring-blue-100";
 
 /* Reusable input field */
 const Field = ({
@@ -51,7 +51,7 @@ const Field = ({
 }) => (
   <div className={className}>
     {label && (
-      <label className="mb-1.5 block text-sm font-semibold text-[#26364D]">
+      <label className="mb-1.5 block text-sm font-semibold text-foreground">
         {label}
       </label>
     )}
@@ -127,18 +127,18 @@ const Signup = () => {
   };
 
   return (
-    <main className="min-h-screen bg-[#F4F7FC] px-4 py-7">
+    <main className="min-h-screen bg-background px-4 py-7">
       <div className="mx-auto max-w-6xl overflow-hidden rounded-3xl bg-white shadow-xl">
 
         {/* Header */}
         <header className="border-b border-gray-100 px-6 py-4 sm:px-10">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-[#EAF0F8] p-2.5 text-[#123B73]">
+            <div className="rounded-xl bg-brand/10 p-2.5 text-brand">
               <Recycle size={24} />
             </div>
 
             <div>
-              <h1 className="font-bold text-[#123B73]">
+              <h1 className="font-bold text-brand">
                 SmartScrap AI
               </h1>
 
@@ -152,7 +152,7 @@ const Signup = () => {
         <div className="grid lg:grid-cols-[0.75fr_1.25fr]">
 
           {/* Left Section */}
-          <section className="hidden bg-[#123B73] p-10 text-white lg:flex lg:flex-col lg:justify-center">
+          <section className="hidden bg-brand p-10 text-white lg:flex lg:flex-col lg:justify-center">
 
             <span className="w-fit rounded-full bg-white/10 px-4 py-2 text-xs font-semibold">
               JOIN SMARTSCRAP AI
@@ -219,11 +219,11 @@ const Signup = () => {
             <div className="mx-auto max-w-2xl">
 
               <div className="mb-6">
-                <p className="text-sm font-bold text-[#123B73]">
+                <p className="text-sm font-bold text-brand">
                   GET STARTED
                 </p>
 
-                <h2 className="mt-1 text-3xl font-bold text-[#14213D]">
+                <h2 className="mt-1 text-3xl font-bold text-foreground">
                   Create your account
                 </h2>
 
@@ -274,7 +274,7 @@ const Signup = () => {
 
                 {/* Business Information */}
                 <div>
-                  <h3 className="mb-3 font-bold text-[#14213D]">
+                  <h3 className="mb-3 font-bold text-foreground">
                     Business Information
                   </h3>
 
@@ -313,7 +313,7 @@ const Signup = () => {
 
                 {/* Contact Information */}
                 <div>
-                  <h3 className="mb-3 font-bold text-[#14213D]">
+                  <h3 className="mb-3 font-bold text-foreground">
                     Contact Information
                   </h3>
 
@@ -344,7 +344,7 @@ const Signup = () => {
 
                 {/* Account Security */}
                 <div>
-                  <h3 className="mb-3 font-bold text-[#14213D]">
+                  <h3 className="mb-3 font-bold text-foreground">
                     Account Security
                   </h3>
 
@@ -431,7 +431,7 @@ const Signup = () => {
 
                 {/* Business Location */}
                 <div>
-                  <h3 className="mb-3 font-bold text-[#14213D]">
+                  <h3 className="mb-3 font-bold text-foreground">
                     Business Location
                   </h3>
 
@@ -494,7 +494,7 @@ const Signup = () => {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="!flex !h-12 !w-full !items-center !justify-center !rounded-xl !bg-[#F4C542] !font-bold !text-[#14213D] hover:!bg-[#E6B932]"
+                  className="!flex !h-12 !w-full !items-center !justify-center !rounded-xl !bg-brand-accent !font-bold !text-foreground hover:!bg-brand-accent/90"
                 >
                   {loading ? "Creating Account..." : "Create Account"}
 
@@ -509,7 +509,7 @@ const Signup = () => {
                   <button
                     type="button"
                     onClick={() => navigate(RoutePath.LOGIN)}
-                    className="font-bold text-[#123B73]"
+                    className="font-bold text-brand"
                   >
                     Login
                   </button>

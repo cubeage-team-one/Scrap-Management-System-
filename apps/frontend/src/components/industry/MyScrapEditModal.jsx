@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, Package, Tag, Scale, DollarSign, Layers, MapPin, CheckCircle2, Save } from "lucide-react";
 
 const CATEGORY_OPTIONS = [
@@ -27,35 +27,18 @@ const STATUS_OPTIONS = [
 ];
 
 const MyScrapEditModal = ({ isOpen, onClose, scrapItem, onUpdateScrap }) => {
-  const [formData, setFormData] = useState({
-    id: "",
-    material: "",
-    category: "Steel",
-    weightKg: "",
-    weightMT: "",
-    condition: "Grade A",
-    location: "",
-    pricePerMT: "",
-    status: "Available",
-    imageUrl: ""
-  });
-
-  useEffect(() => {
-    if (scrapItem) {
-      setFormData({
-        id: scrapItem.id || "",
-        material: scrapItem.material || "",
-        category: scrapItem.category || "Steel",
-        weightKg: scrapItem.weightRawKg || scrapItem.weightKg?.replace(/[^0-9.]/g, '') || "",
-        weightMT: scrapItem.qtyRawMT || scrapItem.qtyUnit?.replace(/[^0-9.]/g, '') || "",
-        condition: scrapItem.condition || "Grade A",
-        location: scrapItem.location || "",
-        pricePerMT: scrapItem.expPriceRaw || scrapItem.expPriceMT?.replace(/[^0-9.]/g, '') || "",
-        status: scrapItem.status || "Available",
-        imageUrl: scrapItem.imageUrl || ""
-      });
-    }
-  }, [scrapItem, isOpen]);
+  const [formData, setFormData] = useState(() => ({
+    id: scrapItem?.id || "",
+    material: scrapItem?.material || "",
+    category: scrapItem?.category || "Steel",
+    weightKg: scrapItem?.weightRawKg || scrapItem?.weightKg?.replace(/[^0-9.]/g, '') || "",
+    weightMT: scrapItem?.qtyRawMT || scrapItem?.qtyUnit?.replace(/[^0-9.]/g, '') || "",
+    condition: scrapItem?.condition || "Grade A",
+    location: scrapItem?.location || "",
+    pricePerMT: scrapItem?.expPriceRaw || scrapItem?.expPriceMT?.replace(/[^0-9.]/g, '') || "",
+    status: scrapItem?.status || "Available",
+    imageUrl: scrapItem?.imageUrl || ""
+  }));
 
   if (!isOpen || !scrapItem) return null;
 

@@ -10,8 +10,8 @@ const Process = () => {
           <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 text-sm font-semibold mb-6 uppercase tracking-wider">
             Process
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-[#111827] leading-tight">
-            Up and running <span className="text-[#011C6B]">in 3 steps</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
+            Up and running <span className="text-brand">in 3 steps</span>
           </h2>
         </div>
 
@@ -24,10 +24,10 @@ const Process = () => {
             
             {/* Step 1 */}
             <div className="flex flex-col items-center text-center relative z-10">
-              <div className="w-24 h-24 rounded-full bg-white border-2 border-gray-100 shadow-sm flex items-center justify-center text-3xl font-bold text-[#011C6B] mb-8">
+              <div className="w-24 h-24 rounded-full bg-white border-2 border-gray-100 shadow-sm flex items-center justify-center text-3xl font-bold text-brand mb-8">
                 01
               </div>
-              <h3 className="text-2xl font-bold text-[#111827] mb-4">
+              <h3 className="text-2xl font-bold text-foreground mb-4">
                 Register & Verify
               </h3>
               <p className="text-gray-500 leading-relaxed max-w-xs">
@@ -37,10 +37,10 @@ const Process = () => {
 
             {/* Step 2 */}
             <div className="flex flex-col items-center text-center relative z-10">
-              <div className="w-24 h-24 rounded-full bg-[#011C6B] shadow-[0_10px_30px_rgba(1,28,107,0.3)] flex items-center justify-center text-3xl font-bold text-[#F59E0B] mb-8">
+              <div className="w-24 h-24 rounded-full bg-brand shadow-[0_10px_30px_color-mix(in_oklch,var(--brand)_30%,transparent)] flex items-center justify-center text-3xl font-bold text-brand-accent mb-8">
                 02
               </div>
-              <h3 className="text-2xl font-bold text-[#111827] mb-4">
+              <h3 className="text-2xl font-bold text-foreground mb-4">
                 List or Browse
               </h3>
               <p className="text-gray-500 leading-relaxed max-w-xs">
@@ -50,10 +50,10 @@ const Process = () => {
 
             {/* Step 3 */}
             <div className="flex flex-col items-center text-center relative z-10">
-              <div className="w-24 h-24 rounded-full bg-white border-2 border-gray-100 shadow-sm flex items-center justify-center text-3xl font-bold text-[#011C6B] mb-8">
+              <div className="w-24 h-24 rounded-full bg-white border-2 border-gray-100 shadow-sm flex items-center justify-center text-3xl font-bold text-brand mb-8">
                 03
               </div>
-              <h3 className="text-2xl font-bold text-[#111827] mb-4">
+              <h3 className="text-2xl font-bold text-foreground mb-4">
                 Transact & Track
               </h3>
               <p className="text-gray-500 leading-relaxed max-w-xs">
@@ -66,7 +66,7 @@ const Process = () => {
 
         {/* CTA Button */}
         <div className="mt-20 flex justify-center">
-          <button className="px-8 py-4 rounded-xl bg-[#011C6B] text-white font-semibold flex items-center gap-2 hover:bg-[#011C6B]/90 transition-all shadow-lg">
+          <button className="px-8 py-4 rounded-xl bg-brand text-white font-semibold flex items-center gap-2 hover:bg-brand/90 transition-all shadow-lg">
             Create your free account <ArrowRight className="w-5 h-5" />
           </button>
         </div>

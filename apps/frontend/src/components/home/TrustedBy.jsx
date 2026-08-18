@@ -4,7 +4,7 @@ const TrustedBy = () => {
   return (
     <>
       {/* Wave Transition (Transitions from Hero Blue to White) */}
-      <div className="w-full bg-[#011C6B]">
+      <div className="w-full bg-brand">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full h-auto -mt-1 block">
           <path fill="#ffffff" fillOpacity="1" d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,42.7C1120,32,1280,32,1360,32L1440,32L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"></path>
         </svg>
@@ -20,7 +20,7 @@ const TrustedBy = () => {
             {['Tata Steel', 'Mahindra', 'Havells', 'Reliance', 'JSW Steel', 'Hindalco', 'SAIL', 'Vedanta'].map((company) => (
               <span 
                 key={company} 
-                className="hover:text-[#011C6B] transition-colors duration-300 cursor-default"
+                className="hover:text-brand transition-colors duration-300 cursor-default"
               >
                 {company}
               </span>
@@ -30,7 +30,7 @@ const TrustedBy = () => {
       </section>
 
       {/* Stats Section (Dark Navy Background) */}
-      <section className="bg-[#02154c] py-20">
+      <section className="bg-brand py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 text-center">
             {/* Stat 1 */}

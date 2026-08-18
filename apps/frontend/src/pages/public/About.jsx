@@ -99,27 +99,27 @@ const features = [
 ];
 
 const WhyChooseUsItem = ({ icon: Icon, title, description }) => (
-  <div className="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-6">
-    <div className="h-12 w-12 rounded-xl bg-blue-600/10 flex items-center justify-center mb-4">
-      <Icon className="h-6 w-6 text-blue-600" />
+  <div className="bg-card rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-6">
+    <div className="h-12 w-12 rounded-xl bg-brand/10 flex items-center justify-center mb-4">
+      <Icon className="h-6 w-6 text-brand" />
     </div>
-    <h3 className="text-lg font-bold text-gray-900 mb-2">{title}</h3>
-    <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
+    <h3 className="text-lg font-bold text-foreground mb-2">{title}</h3>
+    <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
   </div>
 );
 
 const HowItWorksStep = ({ icon: Icon, step, title, description, isLast }) => (
   <div className="relative flex flex-col items-center text-center px-4">
-    <div className="h-16 w-16 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg mb-4">
+    <div className="h-16 w-16 rounded-full bg-brand text-white flex items-center justify-center shadow-lg mb-4">
       <Icon className="h-7 w-7" />
     </div>
-    <span className="text-sm font-bold text-blue-600 mb-1">{step}</span>
-    <h3 className="text-lg font-bold text-gray-900 mb-2">{title}</h3>
-    <p className="text-sm text-gray-600 leading-relaxed max-w-xs">
+    <span className="text-sm font-bold text-brand mb-1">{step}</span>
+    <h3 className="text-lg font-bold text-foreground mb-2">{title}</h3>
+    <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
       {description}
     </p>
     {!isLast && (
-      <ArrowRight className="hidden lg:block absolute top-1/3 -right-6 h-6 w-6 text-blue-300" />
+      <ArrowRight className="hidden lg:block absolute top-1/3 -right-6 h-6 w-6 text-muted-foreground" />
     )}
   </div>
 );
@@ -128,15 +128,15 @@ const About = () => {
   return (
     <div>
       {/* ================= HERO ================= */}
-      <section className="bg-blue-600 text-white">
+      <section className="bg-brand text-white">
         <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-          <span className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
+          <span className="inline-flex items-center gap-2 bg-brand-foreground/10 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
             <Sparkles className="h-4 w-4" /> Scrap Management System
           </span>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-6">
             About Us
           </h1>
-          <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-brand-foreground/80 max-w-3xl mx-auto leading-relaxed">
             A digital marketplace where industries, dealers and buyers come
             together to buy and sell scrap through transparent, fair and
             live auctions.
@@ -148,19 +148,19 @@ const About = () => {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <span className="text-sm font-bold text-blue-600 uppercase tracking-wider mb-3 block">
+            <span className="text-sm font-bold text-brand uppercase tracking-wider mb-3 block">
               Who We Are
             </span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-6 leading-tight">
               Giving Scrap a Second Life Through Smart Digital Auctions
             </h2>
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-muted-foreground leading-relaxed mb-4">
               We are a team on a mission to organize the unstructured scrap
               trading industry. What was once done through word-of-mouth and
               unverified middlemen now happens on a single platform — with
               live auctions, verified participants and complete transparency.
             </p>
-            <p className="text-gray-600 leading-relaxed mb-6">
+            <p className="text-muted-foreground leading-relaxed mb-6">
               Our platform connects industrial scrap generators with verified
               dealers and buyers. A dedicated super admin keeps the
               marketplace safe by managing roles, categories, auctions and
@@ -168,24 +168,24 @@ const About = () => {
               trading experience.
             </p>
             <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2 text-gray-700">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <CheckCircle2 className="h-5 w-5 text-success" />
                 Govt-grade verification
               </div>
-              <div className="flex items-center gap-2 text-gray-700">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <CheckCircle2 className="h-5 w-5 text-success" />
                 100% digital process
               </div>
-              <div className="flex items-center gap-2 text-gray-700">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <CheckCircle2 className="h-5 w-5 text-success" />
                 Pan-India reach
               </div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-3xl p-8 text-white shadow-xl">
+          <div className="gradient-brand rounded-3xl p-8 text-white shadow-xl">
             <div className="flex items-center gap-3 mb-6">
-              <Recycle className="h-10 w-10 text-yellow-300" />
+              <Recycle className="h-10 w-10 text-brand-accent" />
               <h3 className="text-xl font-bold">Our Commitment</h3>
             </div>
             <ul className="space-y-5">
@@ -196,18 +196,18 @@ const About = () => {
                 "Trust built on verified buyers, sellers and dealers",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-yellow-300 shrink-0 mt-0.5" />
-                  <span className="text-blue-50 leading-relaxed">{item}</span>
+                  <CheckCircle2 className="h-5 w-5 text-brand-accent shrink-0 mt-0.5" />
+                  <span className="text-brand-foreground/90 leading-relaxed">{item}</span>
                 </li>
               ))}
             </ul>
-            <div className="mt-8 border-t border-blue-500 pt-6 grid grid-cols-2 gap-4">
+            <div className="mt-8 border-t border-brand-glow/40 pt-6 grid grid-cols-2 gap-4">
               <div className="flex items-center gap-2">
-                <Globe className="h-5 w-5 text-yellow-300" />
+                <Globe className="h-5 w-5 text-brand-accent" />
                 <span className="text-sm">Works across India</span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-yellow-300" />
+                <Clock className="h-5 w-5 text-brand-accent" />
                 <span className="text-sm">Live 24/7 auctions</span>
               </div>
             </div>
@@ -216,29 +216,29 @@ const About = () => {
       </section>
 
       {/* ================= MISSION & VISION ================= */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-muted">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-8">
-          <div className="bg-white rounded-2xl shadow-md p-8 border-t-4 border-blue-600">
-            <div className="h-12 w-12 rounded-xl bg-blue-600/10 flex items-center justify-center mb-4">
-              <Target className="h-6 w-6 text-blue-600" />
+          <div className="bg-card rounded-2xl shadow-md p-8 border-t-4 border-brand">
+            <div className="h-12 w-12 rounded-xl bg-brand/10 flex items-center justify-center mb-4">
+              <Target className="h-6 w-6 text-brand" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <h3 className="text-2xl font-bold text-foreground mb-3">
               Our Mission
             </h3>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               To digitalize the entire scrap trading lifecycle — from listing
               and inspection to auction and delivery — so every kilogram of
               scrap finds its highest-value buyer at the fairest market price.
             </p>
           </div>
-          <div className="bg-white rounded-2xl shadow-md p-8 border-t-4 border-yellow-400">
-            <div className="h-12 w-12 rounded-xl bg-yellow-400/10 flex items-center justify-center mb-4">
-              <Eye className="h-6 w-6 text-yellow-500" />
+          <div className="bg-card rounded-2xl shadow-md p-8 border-t-4 border-brand-accent">
+            <div className="h-12 w-12 rounded-xl bg-brand-accent/10 flex items-center justify-center mb-4">
+              <Eye className="h-6 w-6 text-brand-accent" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <h3 className="text-2xl font-bold text-foreground mb-3">
               Our Vision
             </h3>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               To become India's most trusted scrap exchange — building a
               circular economy where nothing goes to waste, businesses grow
               sustainably and recycling becomes the default, not the last
@@ -249,7 +249,7 @@ const About = () => {
       </section>
 
       {/* ================= STATS ================= */}
-      <section className="py-20 bg-blue-600 text-white">
+      <section className="py-20 bg-brand text-white">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-12">
             Our Impact So Far
@@ -257,10 +257,10 @@ const About = () => {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat) => (
               <div key={stat.label} className="text-center">
-                <p className="text-4xl md:text-5xl font-extrabold text-yellow-300 mb-2">
+                <p className="text-4xl md:text-5xl font-extrabold text-brand-accent mb-2">
                   {stat.value}
                 </p>
-                <p className="text-blue-100 font-medium">{stat.label}</p>
+                <p className="text-brand-foreground/80 font-medium">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -271,13 +271,13 @@ const About = () => {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
-            <span className="text-sm font-bold text-blue-600 uppercase tracking-wider mb-3 block">
+            <span className="text-sm font-bold text-brand uppercase tracking-wider mb-3 block">
               How It Works
             </span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-foreground">
               From Scrap Listing to a Winning Bid
             </h2>
-            <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
+            <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
               A simple, four-step journey that every industry, dealer and
               buyer follows on our platform.
             </p>
@@ -298,13 +298,13 @@ const About = () => {
       </section>
 
       {/* ================= WHY CHOOSE US ================= */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-muted">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
-            <span className="text-sm font-bold text-blue-600 uppercase tracking-wider mb-3 block">
+            <span className="text-sm font-bold text-brand uppercase tracking-wider mb-3 block">
               Why Choose Us
             </span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-foreground">
               Built for Honest, Modern Scrap Trading
             </h2>
           </div>
@@ -320,40 +320,40 @@ const About = () => {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
-            <span className="text-sm font-bold text-blue-600 uppercase tracking-wider mb-3 block">
+            <span className="text-sm font-bold text-brand uppercase tracking-wider mb-3 block">
               For Everyone
             </span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-foreground">
               Who Can Use This Platform?
             </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-gray-50 rounded-2xl p-8 text-center border border-gray-200 hover:border-blue-600 hover:shadow-lg transition-all duration-300">
-              <Factory className="h-10 w-10 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
+            <div className="bg-muted rounded-2xl p-8 text-center border border-border hover:border-brand hover:shadow-lg transition-all duration-300">
+              <Factory className="h-10 w-10 text-brand mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-foreground mb-3">
                 Industries
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 List your production scrap, set reserve prices and watch
                 buyers compete for your lots in live auctions.
               </p>
             </div>
-            <div className="bg-gray-50 rounded-2xl p-8 text-center border border-gray-200 hover:border-blue-600 hover:shadow-lg transition-all duration-300">
-              <Handshake className="h-10 w-10 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
+            <div className="bg-muted rounded-2xl p-8 text-center border border-border hover:border-brand hover:shadow-lg transition-all duration-300">
+              <Handshake className="h-10 w-10 text-brand mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-foreground mb-3">
                 Dealers
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 Access a steady pipeline of industrial scrap, bid
                 competitively and grow your trading business digitally.
               </p>
             </div>
-            <div className="bg-gray-50 rounded-2xl p-8 text-center border border-gray-200 hover:border-blue-600 hover:shadow-lg transition-all duration-300">
-              <Wallet className="h-10 w-10 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
+            <div className="bg-muted rounded-2xl p-8 text-center border border-border hover:border-brand hover:shadow-lg transition-all duration-300">
+              <Wallet className="h-10 w-10 text-brand mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-foreground mb-3">
                 Buyers
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 Source quality scrap at transparent market prices with
                 verified sellers and secure payment flow.
               </p>
@@ -365,19 +365,19 @@ const About = () => {
       {/* ================= CTA ================= */}
       <section className="py-20">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-3xl p-10 md:p-14 text-center text-white shadow-2xl relative overflow-hidden">
-            <Award className="h-16 w-16 text-yellow-300 mx-auto mb-6" />
+          <div className="gradient-brand rounded-3xl p-10 md:p-14 text-center text-white shadow-2xl relative overflow-hidden">
+            <Award className="h-16 w-16 text-brand-accent mx-auto mb-6" />
             <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
               Ready to Join the Scrap Revolution?
             </h2>
-            <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-brand-foreground/80 text-lg mb-8 max-w-2xl mx-auto">
               Whether you're an industry looking to sell, a dealer or buyer
               looking to bid — your place in India's smartest scrap
               marketplace is just a sign-up away.
             </p>
             <a
               href="/signup"
-              className="inline-flex items-center gap-2 bg-yellow-400 text-gray-900 font-bold px-8 py-4 rounded-xl hover:bg-yellow-300 transition-colors duration-300"
+              className="inline-flex items-center gap-2 bg-brand-accent text-foreground font-bold px-8 py-4 rounded-xl hover:bg-brand-accent/90 transition-colors duration-300"
             >
               Get Started Free <ArrowRight className="h-5 w-5" />
             </a>

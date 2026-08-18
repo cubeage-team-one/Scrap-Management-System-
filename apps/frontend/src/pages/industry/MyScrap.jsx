@@ -1,26 +1,16 @@
 import { useState, useMemo } from "react";
-import { 
-  Search, 
-  Bell, 
-  Settings, 
-  Plus, 
-  Download, 
-  Eye, 
-  Edit, 
-  Copy, 
-  Trash2, 
-  ChevronLeft, 
-  ChevronRight,
+import {
+  Search,
+  Plus,
+  Download,
+  Copy,
+  Trash2,
   ChevronDown,
-  CheckSquare,
-  Square,
-  Package,
-  Layers,
-  Filter,
-  CheckCircle,
-  AlertCircle
+  CheckCircle
 } from "lucide-react";
 
+import MaterialTable from "../../components/common/MaterialTable";
+import { myScrapTableConfig } from "../../configs/tables/myScrapTable.config";
 import MyScrapAddModal from "../../components/industry/MyScrapAddModal";
 import MyScrapEditModal from "../../components/industry/MyScrapEditModal";
 import MyScrapViewModal from "../../components/industry/MyScrapViewModal";
@@ -231,21 +221,18 @@ const MyScrap = () => {
     });
   }, [scrapList, searchQuery, topSearch, statusFilter, categoryFilter]);
 
-  // Select / Deselect Handlers
-  const isAllSelected = filteredItems.length > 0 && selectedIds.length === filteredItems.length;
+  // Row selection state, adapted between MaterialTable's { [id]: true } shape
+  // (used by Material React Table's built-in checkbox column) and the plain
+  // `selectedIds` array that the rest of this page's bulk-action logic uses.
+  const rowSelection = useMemo(
+    () => Object.fromEntries(selectedIds.map((id) => [id, true])),
+    [selectedIds]
+  );
 
-  const handleSelectAll = () => {
-    if (isAllSelected) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(filteredItems.map(item => item.id));
-    }
-  };
-
-  const handleSelectRow = (id) => {
-    setSelectedIds(prev => 
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
+  const handleRowSelectionChange = (updaterOrValue) => {
+    const nextSelection =
+      typeof updaterOrValue === "function" ? updaterOrValue(rowSelection) : updaterOrValue;
+    setSelectedIds(Object.keys(nextSelection).filter((id) => nextSelection[id]));
   };
 
   // CRUD Operations
@@ -259,13 +246,12 @@ const MyScrap = () => {
     showToast(`Updated details for ${updatedLot.id}`);
   };
 
-  const handleDeleteScrap = (id) => {
-    const item = scrapList.find(i => i.id === id);
-    if (window.confirm(`Are you sure you want to delete ${item?.material || id} from inventory?`)) {
-      setScrapList(prev => prev.filter(i => i.id !== id));
-      setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
-      showToast(`Deleted ${id} from inventory.`);
-    }
+  // MaterialTable shows its own confirmation dialog before calling this, so
+  // no window.confirm is needed here.
+  const handleDeleteScrap = (item) => {
+    setScrapList(prev => prev.filter(i => i.id !== item.id));
+    setSelectedIds(prev => prev.filter(selectedId => selectedId !== item.id));
+    showToast(`Deleted ${item.id} from inventory.`);
   };
 
   const handleDuplicateScrap = (item) => {
@@ -327,85 +313,6 @@ const MyScrap = () => {
     showToast(`Exported ${itemsToExport.length} scrap items to CSV file!`);
   };
 
-  // Category Tag Styler
-  const renderCategoryPill = (category) => {
-    switch (category) {
-      case "Steel":
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">Steel</span>;
-      case "Copper":
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">Copper</span>;
-      case "Aluminium":
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-800">Aluminium</span>;
-      case "Plastic":
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">Plastic</span>;
-      case "Electronic Waste":
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800">Electronic Waste</span>;
-      case "Rubber":
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-700">Rubber</span>;
-      default:
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">{category}</span>;
-    }
-  };
-
-  // Condition Badge Styler
-  const renderConditionPill = (condition) => {
-    if (condition === "Grade A") {
-      return (
-        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200">
-          Grade A
-        </span>
-      );
-    }
-    if (condition === "Grade B") {
-      return (
-        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200">
-          Grade B
-        </span>
-      );
-    }
-    return (
-      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold text-orange-700 bg-orange-50 border border-orange-200">
-        Grade C
-      </span>
-    );
-  };
-
-  // Status Badge Styler
-  const renderStatusBadge = (status) => {
-    switch (status) {
-      case "Available":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-            Available
-          </span>
-        );
-      case "Partially Listed":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
-            Partially Listed
-          </span>
-        );
-      case "Fully Listed":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
-            Fully Listed
-          </span>
-        );
-      case "Sold":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600">
-            Sold
-          </span>
-        );
-      default:
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">
-            {status}
-          </span>
-        );
-    }
-  };
-
   return (
     <div className="space-y-5 font-sans pb-10 text-slate-800">
       
@@ -417,59 +324,7 @@ const MyScrap = () => {
         </div>
       )}
 
-      {/* ================= TOP HEADER ================= */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">My Scrap</h1>
-          <p className="text-xs text-slate-500 mt-0.5 font-medium">Manage and track all scrap inventory</p>
-        </div>
-
-        {/* Top Right Utility Bar */}
-        <div className="flex items-center gap-3 self-end md:self-auto">
-          
-          {/* Search bar */}
-          <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input 
-              type="text" 
-              placeholder="Search Inventory, listings..." 
-              value={topSearch}
-              onChange={(e) => setTopSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#855836] w-56 md:w-64 transition-all shadow-2xs"
-            />
-          </div>
-
-          {/* Notification Icon with Badge */}
-          <button 
-            onClick={() => showToast("You have 2 new buyer inquiries for Copper Wire Scrap")}
-            className="relative p-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
-          >
-            <Bell className="w-4 h-4" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-              2
-            </span>
-          </button>
-
-          {/* Settings Icon */}
-          <button 
-            onClick={() => showToast("Opening inventory settings & warehouse configuration")}
-            className="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
-
-          {/* User Profile Chip */}
-          <div className="flex items-center gap-2.5 pl-2">
-            <div className="w-9 h-9 rounded-full bg-amber-100 text-amber-900 border border-amber-200 flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-              RK
-            </div>
-            <div className="hidden sm:block text-left">
-              <div className="text-xs font-bold text-slate-900 leading-tight">Rajesh Kumar</div>
-              <div className="text-[10px] text-slate-400 font-semibold leading-tight">Industry</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      
 
       {/* ================= 6 STAT CARDS ROW ================= */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
@@ -617,6 +472,15 @@ const MyScrap = () => {
               <Download className="w-3.5 h-3.5" /> Export Selected
             </button>
 
+            {selectedIds.length === 1 && (
+              <button
+                onClick={() => handleDuplicateScrap(scrapList.find(item => item.id === selectedIds[0]))}
+                className="px-3.5 py-1.5 rounded-xl bg-white border border-amber-200 text-amber-900 hover:bg-amber-100/50 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Copy className="w-3.5 h-3.5" /> Duplicate
+              </button>
+            )}
+
             <button
               onClick={handleBulkDelete}
               className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
@@ -635,195 +499,17 @@ const MyScrap = () => {
       )}
 
       {/* ================= INVENTORY TABLE ================= */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
-        
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            
-            {/* Table Header */}
-            <thead className="bg-[#fbf7ee] text-slate-500 font-bold uppercase tracking-wider text-[11px] border-b border-amber-100/70">
-              <tr>
-                <th className="px-4 py-3.5 w-10 text-center">
-                  <input 
-                    type="checkbox"
-                    checked={isAllSelected}
-                    onChange={handleSelectAll}
-                    className="w-3.5 h-3.5 rounded text-[#855836] focus:ring-[#855836] cursor-pointer"
-                  />
-                </th>
-                <th className="px-4 py-3.5">MATERIAL</th>
-                <th className="px-4 py-3.5">CATEGORY</th>
-                <th className="px-4 py-3.5">WEIGHT</th>
-                <th className="px-4 py-3.5">QTY / UNIT</th>
-                <th className="px-4 py-3.5">CONDITION</th>
-                <th className="px-4 py-3.5">LOCATION</th>
-                <th className="px-4 py-3.5">EXP. PRICE/MT</th>
-                <th className="px-4 py-3.5">STATUS</th>
-                <th className="px-4 py-3.5 text-center">ACTIONS</th>
-              </tr>
-            </thead>
-
-            {/* Table Body */}
-            <tbody className="divide-y divide-slate-100 font-medium">
-              {filteredItems.length === 0 ? (
-                <tr>
-                  <td colSpan={10} className="px-6 py-12 text-center text-slate-400">
-                    <Package className="w-10 h-10 mx-auto text-slate-300 mb-2 stroke-[1.5]" />
-                    <div className="font-bold text-sm text-slate-700">No scrap inventory found</div>
-                    <div className="text-xs text-slate-400 mt-1">Try adjusting your filters or click "+ Add Scrap" to create one.</div>
-                  </td>
-                </tr>
-              ) : (
-                filteredItems.map((item) => {
-                  const isChecked = selectedIds.includes(item.id);
-                  return (
-                    <tr 
-                      key={item.id} 
-                      className={`hover:bg-amber-50/30 transition-colors ${isChecked ? "bg-amber-50/40" : ""}`}
-                    >
-                      {/* Checkbox */}
-                      <td className="px-4 py-3.5 text-center">
-                        <input 
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => handleSelectRow(item.id)}
-                          className="w-3.5 h-3.5 rounded text-[#855836] focus:ring-[#855836] cursor-pointer"
-                        />
-                      </td>
-
-                      {/* Material (Thumbnail + Name + ID) */}
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 shrink-0 shadow-2xs">
-                            <img 
-                              src={item.imageUrl} 
-                              alt={item.material}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.target.src = "https://images.unsplash.com/photo-1535813547-99c456a41d4a?w=150&auto=format&fit=crop&q=80";
-                              }}
-                            />
-                          </div>
-                          <div>
-                            <div className="font-bold text-slate-900 leading-snug">{item.material}</div>
-                            <div className="text-[10px] text-slate-400 font-mono font-medium">{item.id}</div>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Category */}
-                      <td className="px-4 py-3.5 whitespace-nowrap">
-                        {renderCategoryPill(item.category)}
-                      </td>
-
-                      {/* Weight */}
-                      <td className="px-4 py-3.5 font-bold text-slate-900 whitespace-nowrap">
-                        {item.weightKg}
-                      </td>
-
-                      {/* Qty / Unit */}
-                      <td className="px-4 py-3.5 font-semibold text-slate-700 whitespace-nowrap">
-                        {item.qtyUnit}
-                      </td>
-
-                      {/* Condition */}
-                      <td className="px-4 py-3.5 whitespace-nowrap">
-                        {renderConditionPill(item.condition)}
-                      </td>
-
-                      {/* Location */}
-                      <td className="px-4 py-3.5 text-slate-600 whitespace-nowrap">
-                        {item.location}
-                      </td>
-
-                      {/* Exp. Price / MT */}
-                      <td className="px-4 py-3.5 font-extrabold text-slate-900 whitespace-nowrap">
-                        {item.expPriceMT}
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-4 py-3.5 whitespace-nowrap">
-                        {renderStatusBadge(item.status)}
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-4 py-3.5 whitespace-nowrap">
-                        <div className="flex items-center justify-center gap-2">
-                          
-                          {/* View */}
-                          <button
-                            onClick={() => setViewingItem(item)}
-                            title="View Details"
-                            className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-
-                          {/* Edit */}
-                          <button
-                            onClick={() => setEditingItem(item)}
-                            title="Edit Lot"
-                            className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-
-                          {/* Duplicate */}
-                          <button
-                            onClick={() => handleDuplicateScrap(item)}
-                            title="Duplicate Lot"
-                            className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
-                          >
-                            <Copy className="w-4 h-4" />
-                          </button>
-
-                          {/* Delete */}
-                          <button
-                            onClick={() => handleDeleteScrap(item.id)}
-                            title="Delete Item"
-                            className="p-1 text-rose-400 hover:text-rose-600 transition-colors cursor-pointer"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-
-                        </div>
-                      </td>
-
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-
-          </table>
-        </div>
-
-        {/* ================= TABLE FOOTER & PAGINATION ================= */}
-        <div className="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
-          <div>
-            Showing {filteredItems.length} of {scrapList.length} items
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button 
-              disabled
-              className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-300 cursor-not-allowed"
-            >
-              <ChevronLeft className="w-3.5 h-3.5" />
-            </button>
-            <button className="w-7 h-7 rounded-lg bg-[#855836] text-white font-bold flex items-center justify-center shadow-2xs">
-              1
-            </button>
-            <button 
-              disabled
-              className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-300 cursor-not-allowed"
-            >
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
-      </div>
+      <MaterialTable
+        config={myScrapTableConfig}
+        data={filteredItems}
+        getRowId={(row) => row.id}
+        onView={(item) => setViewingItem(item)}
+        onEdit={(item) => setEditingItem(item)}
+        onDelete={handleDeleteScrap}
+        enableRowSelection
+        rowSelection={rowSelection}
+        onRowSelectionChange={handleRowSelectionChange}
+      />
 
       {/* ================= MODALS ================= */}
       <MyScrapAddModal
@@ -833,12 +519,15 @@ const MyScrap = () => {
         nextId={`INV-00${scrapList.length + 1}`}
       />
 
-      <MyScrapEditModal
-        isOpen={!!editingItem}
-        onClose={() => setEditingItem(null)}
-        scrapItem={editingItem}
-        onUpdateScrap={handleUpdateScrap}
-      />
+      {!!editingItem && (
+        <MyScrapEditModal
+          key={editingItem?.id}
+          isOpen={!!editingItem}
+          onClose={() => setEditingItem(null)}
+          scrapItem={editingItem}
+          onUpdateScrap={handleUpdateScrap}
+        />
+      )}
 
       <MyScrapViewModal
         isOpen={!!viewingItem}

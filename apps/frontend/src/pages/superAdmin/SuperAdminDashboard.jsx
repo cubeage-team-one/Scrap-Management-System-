@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { 
-  Factory, 
-  Store, 
-  Users, 
+import {
+  Factory,
+  Store,
+  Users,
   Package,
   Gavel,
   CheckCircle2,
@@ -14,13 +14,11 @@ import {
   ArrowUpDown,
   Loader2
 } from "lucide-react";
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   PieChart,
   Pie,
@@ -32,6 +30,8 @@ import {
   LineChart,
   BarChart
 } from "recharts";
+
+import StateCards from "../../components/dashboard/StateCards";
 
 // --- Mock API Service ---
 // This simulates fetching data from your backend.
@@ -126,7 +126,7 @@ const SuperAdminDashboard = () => {
         setIsLoading(false);
       }
     };
-    
+
     loadData();
   }, [filterRegion]); // Re-fetch if filter changes (simulated)
 
@@ -141,15 +141,11 @@ const SuperAdminDashboard = () => {
 
   return (
     <div className="p-4 md:p-8 max-w-[1600px] mx-auto bg-gray-50 min-h-screen font-sans animate-in fade-in duration-500">
-      
+
       {/* Breadcrumb & Slicer Bar (Power BI Style) */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
-        
-        <div className="flex items-center gap-2 text-sm text-gray-500 w-full lg:w-auto overflow-x-auto whitespace-nowrap pb-1 lg:pb-0">
-          <span>SmartScrap AI</span>
-          <ChevronRight className="w-4 h-4 flex-shrink-0" />
-          <span className="font-semibold text-[#011C6B]">BI Dashboard</span>
-        </div>
+
+
 
         {/* Interactive Slicers */}
         <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 bg-white p-2 rounded-lg shadow-sm border border-gray-200 w-full lg:w-auto">
@@ -157,14 +153,14 @@ const SuperAdminDashboard = () => {
             <Filter className="w-4 h-4 text-gray-400" />
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Filters</span>
           </div>
-          
+
           <select className="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-md px-3 py-2 sm:py-1.5 focus:outline-none focus:ring-2 focus:ring-[#011C6B] w-full sm:w-auto">
             <option>Last 7 Months</option>
             <option>Last 30 Days</option>
             <option>Year to Date</option>
           </select>
 
-          <select 
+          <select
             value={filterRegion}
             onChange={(e) => setFilterRegion(e.target.value)}
             className="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-md px-3 py-2 sm:py-1.5 focus:outline-none focus:ring-2 focus:ring-[#011C6B] w-full sm:w-auto"
@@ -180,7 +176,7 @@ const SuperAdminDashboard = () => {
             <option>Ferrous</option>
             <option>Non-Ferrous</option>
           </select>
-          
+
           <button className="hidden sm:flex ml-auto p-2 sm:p-1.5 text-gray-500 hover:text-[#011C6B] hover:bg-blue-50 rounded-md transition-colors justify-center" title="Export Report">
             <Download className="w-4 h-4" />
           </button>
@@ -194,43 +190,15 @@ const SuperAdminDashboard = () => {
       </div>
 
       {/* KPI Cards with Sparklines */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {data.statCards.map((stat, index) => {
-          const iconConfig = getIconForType(stat.type);
-          return (
-            <div key={index} className="bg-white rounded-xl p-4 md:p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
-              <div className="flex justify-between items-start mb-2 relative z-10">
-                <h3 className="text-gray-500 text-sm font-medium">{stat.title}</h3>
-                <div className={`w-8 h-8 rounded-lg ${iconConfig.bg} flex items-center justify-center`}>
-                  {iconConfig.icon}
-                </div>
-              </div>
-              
-              <div className="flex justify-between items-end relative z-10">
-                <div>
-                  <p className="text-xl md:text-2xl font-bold text-gray-900 mb-1">{stat.value}</p>
-                  <div className={`text-xs font-semibold ${stat.isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
-                    {stat.change}
-                  </div>
-                </div>
-                
-                {/* Mini Sparkline */}
-                <div className="w-16 md:w-20 h-8 md:h-10 opacity-70 group-hover:opacity-100 transition-opacity">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={stat.sparkline}>
-                      <Line type="monotone" dataKey="val" stroke={stat.color} strokeWidth={2} dot={false} isAnimationActive={true} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+
+      <StateCards
+        data={data.statCards}
+        getIconForType={getIconForType}
+      />
 
       {/* BI Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        
+
         {/* Combo Chart (Volume vs Revenue) */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 lg:col-span-2">
           <div className="mb-6">
@@ -241,21 +209,21 @@ const SuperAdminDashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={data.comboData} margin={{ top: 10, right: -10, left: -25, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} dy={10} />
-                
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 10 }} dy={10} />
+
                 {/* Left Y Axis for Volume (Bar) */}
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} width={40} />
+                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 10 }} width={40} />
                 {/* Right Y Axis for Revenue (Line) */}
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} tickFormatter={(value) => `₹${value}`} width={40} />
-                
-                <Tooltip 
+                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 10 }} tickFormatter={(value) => `₹${value}`} width={40} />
+
+                <Tooltip
                   contentStyle={{ borderRadius: '8px', border: '1px solid #f0f0f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
-                  cursor={{fill: '#f8fafc'}}
+                  cursor={{ fill: '#f8fafc' }}
                 />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
-                
+
                 <Bar yAxisId="left" dataKey="volume" name="Volume (MT)" fill="#3B82F6" radius={[4, 4, 0, 0]} maxBarSize={30} />
-                <Line yAxisId="right" type="monotone" dataKey="revenue" name="Revenue (₹ L)" stroke="#F59E0B" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
+                <Line yAxisId="right" type="monotone" dataKey="revenue" name="Revenue (₹ L)" stroke="#F59E0B" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -272,8 +240,8 @@ const SuperAdminDashboard = () => {
               <BarChart layout="vertical" data={data.regionData} margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f0f0f0" />
                 <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#4B5563', fontSize: 11, fontWeight: 500}} width={70} />
-                <Tooltip cursor={{fill: 'transparent'}} contentStyle={{ borderRadius: '8px', border: '1px solid #f0f0f0', fontSize: '12px' }} />
+                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#4B5563', fontSize: 11, fontWeight: 500 }} width={70} />
+                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: '1px solid #f0f0f0', fontSize: '12px' }} />
                 <Bar dataKey="value" fill="#011C6B" radius={[0, 4, 4, 0]} barSize={20}>
                   {data.regionData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={index === 0 ? '#011C6B' : '#60A5FA'} />
@@ -287,7 +255,7 @@ const SuperAdminDashboard = () => {
 
       {/* Bottom Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Inventory Distribution Donut Chart */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 lg:col-span-1 flex flex-col">
           <div>
@@ -332,14 +300,14 @@ const SuperAdminDashboard = () => {
               <p className="text-xs text-gray-500 mt-1">Live data grid with sorting</p>
             </div>
             <div className="relative w-full sm:w-auto">
-              <input 
-                type="text" 
-                placeholder="Search ID..." 
+              <input
+                type="text"
+                placeholder="Search ID..."
                 className="w-full sm:w-auto pl-3 pr-4 py-2 sm:py-1.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#011C6B]"
               />
             </div>
           </div>
-          
+
           <div className="overflow-x-auto flex-1 w-full">
             <table className="w-full text-left border-collapse min-w-[600px]">
               <thead>
@@ -373,11 +341,10 @@ const SuperAdminDashboard = () => {
                     </td>
                     <td className="py-3 px-4 md:px-6 text-sm text-gray-600 font-medium whitespace-nowrap">{company.role}</td>
                     <td className="py-3 px-4 md:px-6 whitespace-nowrap">
-                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${
-                        company.status === 'Approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                        company.status === 'Pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                        'bg-red-50 text-red-700 border-red-200'
-                      }`}>
+                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${company.status === 'Approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                          company.status === 'Pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                            'bg-red-50 text-red-700 border-red-200'
+                        }`}>
                         {company.status}
                       </span>
                     </td>

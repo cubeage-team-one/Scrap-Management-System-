@@ -5,7 +5,7 @@ const Footer = () => {
 
   return (
     <footer
-      className="relative w-full mt-auto bg-[#071126] text-slate-300 font-sans antialiased border-t border-slate-800/80"
+      className="relative w-full mt-auto bg-foreground text-slate-300 font-sans antialiased border-t border-slate-800/80"
       style={{
         fontFamily:
           "'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -39,13 +39,7 @@ const Footer = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-6">
         {/* ================= FULL-WIDTH FLOATING CTA CARD ================= */}
         <div
-          className="relative -mt-36 sm:-mt-44 z-20 w-full overflow-hidden rounded-3xl px-8 py-8 sm:px-14 sm:py-10 shadow-2xl"
-          style={{
-            background:
-              "linear-gradient(135deg, #092357 0%, #0d3882 50%, #06183e 100%)",
-            border: "1px solid rgba(59, 130, 246, 0.3)",
-            boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.75)",
-          }}
+          className="relative -mt-36 sm:-mt-44 z-20 w-full overflow-hidden rounded-3xl px-8 py-8 sm:px-14 sm:py-10 shadow-2xl gradient-brand border border-brand-glow/30"
         >
 
           <div className="relative z-10 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
@@ -65,7 +59,7 @@ const Footer = () => {
                 className="group inline-flex items-center gap-3.5 rounded-full bg-white px-7 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base font-bold text-slate-950 shadow-xl transition-all duration-200 hover:bg-slate-100 hover:shadow-2xl hover:-translate-y-0.5 active:scale-95"
               >
                 <span>Explore Marketplace</span>
-                <span className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-[#d4a054] text-slate-950 font-black transition-transform duration-200 group-hover:rotate-45">
+                <span className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-brand-accent text-slate-950 font-black transition-transform duration-200 group-hover:rotate-45">
                   <svg
                     className="h-4 w-4 sm:h-4.5 sm:w-4.5"
                     viewBox="0 0 24 24"

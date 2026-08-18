@@ -1,31 +1,22 @@
 import { useState } from "react";
-import { 
-  Package, 
-  FileText, 
-  Gavel, 
-  MessageSquare, 
-  CheckCircle2, 
-  IndianRupee, 
-  Percent, 
-  Search, 
-  Bell, 
-  Settings, 
-  Plus, 
-  Clock, 
-  Key, 
-  TrendingUp,
-  Filter,
-  Eye,
-  Download,
-  Tag,
-  Layers,
-  ShieldCheck,
-  Sparkles,
-  ArrowUpRight
+import {
+  Package,
+  FileText,
+  MessageSquare,
+  CheckCircle2,
+  IndianRupee,
+  Percent,
+  Search,
+  Bell,
+  Settings,
+  Plus,
+  Key
 } from "lucide-react";
 
 import AddScrapModal from "../../components/industry/AddScrapModal";
 import LiveBidsModal from "../../components/industry/LiveBidsModal";
+import MaterialTable from "../../components/common/MaterialTable";
+import { industryTableConfig } from "../../configs/tables/industryTable.config";
 
 const initialStockData = [
   {
@@ -241,6 +232,23 @@ const IndustryDashboard = () => {
     showToast(`Accepted bid of ${bidAmount} from ${bidderName}! Deal closed.`);
   };
 
+  // Scrap Inventory table row actions
+  const handleViewLot = (lot) => {
+    if (lot.mode === "Live Auction") {
+      setSelectedAuctionLot(lot);
+    } else {
+      showToast(`Viewing details for ${lot.id}`);
+    }
+  };
+
+  const handleEditLot = (lot) => {
+    showToast(`Editing ${lot.id} — full edit flow coming soon.`);
+  };
+
+  const handleDeleteLot = (lot) => {
+    setStockList((prev) => prev.filter((item) => item.id !== lot.id));
+  };
+
   return (
     <div className="space-y-6 pb-12 font-sans bg-[#FAF8F5] text-slate-800 -m-6 p-6 min-h-screen relative">
       
@@ -252,54 +260,7 @@ const IndustryDashboard = () => {
         </div>
       )}
 
-      {/* ================= TOP HEADER ================= */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Dashboard</h1>
-          <p className="text-xs text-slate-500 font-medium">Executive overview and quick actions</p>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {/* Top Search Bar */}
-          <div className="relative w-64 md:w-80">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search inventory, listings, buyers..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-1.5 rounded-full border border-slate-200 bg-white text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-xs"
-            />
-          </div>
-
-          {/* Notification Bell */}
-          <div className="relative cursor-pointer" onClick={() => showToast("You have 2 new buyer quotation alerts!")}>
-            <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 shadow-xs">
-              <Bell className="w-4 h-4" />
-            </div>
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center border border-white">
-              2
-            </span>
-          </div>
-
-          {/* Settings Gear */}
-          <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 shadow-xs cursor-pointer" onClick={() => showToast("Opening settings menu...")}>
-            <Settings className="w-4 h-4" />
-          </div>
-
-          {/* User Profile Chip */}
-          <div className="flex items-center gap-2 pl-2 border-l border-slate-200 cursor-pointer">
-            <div className="w-8 h-8 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center font-bold text-xs">
-              RK
-            </div>
-            <div className="hidden sm:block text-left">
-              <div className="text-xs font-bold text-slate-900 leading-none">Rajesh Kumar</div>
-              <div className="text-[10px] text-slate-500 font-medium mt-0.5">Industry</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      
       {/* ================= 8 KPI STATS CARDS GRID ================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
@@ -699,129 +660,15 @@ const IndustryDashboard = () => {
         </div>
 
         {/* Inventory Items Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-600">
-            <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-100">
-              <tr>
-                <th className="px-6 py-4">Scrap Lot & ID</th>
-                <th className="px-6 py-4">Category & Grade</th>
-                <th className="px-6 py-4">Quantity / Weight</th>
-                <th className="px-6 py-4">Reserve Price</th>
-                <th className="px-6 py-4">Total Est. Value</th>
-                <th className="px-6 py-4">Sales Mode</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 font-medium">
-              {filteredStock.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="text-center py-10 text-slate-400 text-xs">
-                    No scrap inventory lots found matching your filter options.
-                  </td>
-                </tr>
-              ) : (
-                filteredStock.map((lot) => (
-                  <tr key={lot.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="font-bold text-slate-900 text-sm">{lot.title}</div>
-                      <div className="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">
-                        <span className="font-mono text-blue-600 font-semibold">{lot.id}</span>
-                        <span>· Added {lot.dateAdded}</span>
-                      </div>
-                    </td>
+        <MaterialTable
+          config={industryTableConfig}
+          data={filteredStock}
+          onView={handleViewLot}
+          onEdit={handleEditLot}
+          onDelete={handleDeleteLot}
+        />
 
-                    <td className="px-6 py-4">
-                      <div className="font-semibold text-slate-800">{lot.category}</div>
-                      <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded mt-1 ${
-                        lot.grade === "Grade A" 
-                          ? "bg-emerald-100 text-emerald-800"
-                          : lot.grade === "Grade B"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-slate-100 text-slate-700"
-                      }`}>
-                        {lot.grade}
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-4 font-bold text-slate-900 text-sm">
-                      {lot.weight}
-                    </td>
-
-                    <td className="px-6 py-4 font-medium text-slate-700">
-                      {lot.pricePerUnit}
-                    </td>
-
-                    <td className="px-6 py-4 font-extrabold text-slate-900 text-sm">
-                      {lot.totalValue}
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold border border-slate-200">
-                        {lot.mode}
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-4">
-                      {lot.status === "Bidding Live" && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
-                          Bidding Live ({lot.biddersCount})
-                        </span>
-                      )}
-                      {lot.status === "Pending Quote" && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-300">
-                          <Clock className="w-3 h-3" /> RFQ Open
-                        </span>
-                      )}
-                      {lot.status === "Scheduled" && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">
-                          Scheduled
-                        </span>
-                      )}
-                      {lot.status === "In Stock" && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700">
-                          In Warehouse
-                        </span>
-                      )}
-                      {lot.status === "Completed" && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
-                          <CheckCircle2 className="w-3 h-3" /> Completed
-                        </span>
-                      )}
-                      {lot.status === "Cancelled" && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">
-                          Cancelled
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="px-6 py-4 text-right">
-                      {lot.mode === "Live Auction" ? (
-                        <button
-                          onClick={() => setSelectedAuctionLot(lot)}
-                          className="px-3 py-1.5 rounded-lg bg-[#011C6B] hover:bg-blue-900 text-white font-bold text-xs flex items-center gap-1.5 ml-auto shadow-xs transition-transform active:scale-95 cursor-pointer"
-                        >
-                          <Eye className="w-3.5 h-3.5" /> View Bids
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => showToast(`Viewing details for ${lot.id}`)}
-                          className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 font-semibold text-xs text-slate-700 ml-auto cursor-pointer"
-                        >
-                          Details
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
-          <div>Showing {filteredStock.length} of {stockList.length} total scrap inventory lots</div>
+        <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end text-xs text-slate-500 font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Live Socket Sync Active
           </div>
@@ -977,12 +824,15 @@ const IndustryDashboard = () => {
       </div>
 
       {/* ================= MODAL DIALOGS ================= */}
-      <AddScrapModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onAddScrap={handleAddScrapLot}
-        initialMode={modalMode}
-      />
+      {isAddModalOpen && (
+        <AddScrapModal
+          key={modalMode}
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onAddScrap={handleAddScrapLot}
+          initialMode={modalMode}
+        />
+      )}
 
       <LiveBidsModal
         isOpen={!!selectedAuctionLot}

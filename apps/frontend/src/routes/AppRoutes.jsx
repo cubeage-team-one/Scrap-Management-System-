@@ -13,6 +13,8 @@ import About from "../pages/public/About";
 import Contact from "../pages/public/Contact";
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
+import HelpCenter from "../pages/public/HelpCenter";
+
 
 // Super Admin
 import SuperAdminDashboard from "../pages/superAdmin/SuperAdminDashboard";
@@ -31,12 +33,17 @@ import Settings from "../pages/superAdmin/Settings";
 // Industry
 import IndustryDashboard from "../pages/industry/IndustryDashboard";
 import MyScrap from "../pages/industry/MyScrap";
+import IndustryInventory from "../pages/industry/IndustryInventory";
+import IndustrySettings from "../pages/industry/Settings";
+
 
 // Dealer
 import DealerDashboard from "../pages/dealer/DealerDashboard";
+import DealerProfile from "../pages/dealer/Profile";
 
 // Buyer
 import BuyerDashboard from "../pages/buyer/BuyerDashboard";
+import BuyerProfile from "../pages/buyer/Profile";
 
 const AppRoutes = () => {
   return (
@@ -50,6 +57,8 @@ const AppRoutes = () => {
         <Route path={RoutePath.CONTACT} element={<Contact />} />
         <Route path={RoutePath.LOGIN} element={<Login />} />
         <Route path={RoutePath.SIGNUP} element={<Signup />} />
+        <Route path={RoutePath.HELP_CENTER} element={<HelpCenter />} />
+
       </Route>
 
       {/* ================= DASHBOARD LAYOUT ================= */}
@@ -130,10 +139,21 @@ const AppRoutes = () => {
             element={<IndustryDashboard />}
           />
 
-          <Route
+           <Route
             path={RoutePath.INDUSTRY_MY_SCRAP}
-            element={<MyScrap />}
+            element={<MyScrap />} 
           />
+
+          <Route
+            path={RoutePath.INDUSTRY_INVENTORY}
+            element={<IndustryInventory />}
+          />
+
+          <Route
+            path={RoutePath.INDUSTRY_SETTINGS}
+            element={<IndustrySettings />}
+          />
+
         </Route>
 
         {/* ================= DEALER ================= */}
@@ -149,6 +169,11 @@ const AppRoutes = () => {
             path={RoutePath.DEALER_DASHBOARD}
             element={<DealerDashboard />}
           />
+
+          <Route
+            path={RoutePath.DEALER_PROFILE}
+            element={<DealerProfile />}
+          />
         </Route>
 
         {/* ================= BUYER ================= */}
@@ -163,6 +188,16 @@ const AppRoutes = () => {
           <Route
             path={RoutePath.BUYER_DASHBOARD}
             element={<BuyerDashboard />}
+          />
+
+           <Route
+            path={RoutePath.BUYER_REPORTS}
+            element={<Reports/>}
+          />
+
+          <Route
+            path={RoutePath.BUYER_PROFILE}
+            element={<BuyerProfile />}
           />
         </Route>
 

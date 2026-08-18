@@ -6,7 +6,6 @@ import Roles from '../../components/home/Roles'
 import Testimonials from '../../components/home/Testimonials'
 import Enterprise from '../../components/home/Enterprise'
 import CTA from '../../components/home/CTA'
-import Faq from '../../components/home/Faq'
 
 const Home = () => {
   return (

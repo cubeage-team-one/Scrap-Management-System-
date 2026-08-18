@@ -23,12 +23,12 @@ const testimonials = [
 
 const Testimonials = () => {
   return (
-    <section id="testimonials" className="bg-[#011C6B] py-24 relative overflow-hidden">
+    <section id="testimonials" className="bg-brand py-24 relative overflow-hidden">
       {/* Background Grid Pattern (matching Hero) */}
       <div 
         className="absolute inset-0 z-0 opacity-10"
         style={{
-          backgroundImage: `linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(var(--brand-foreground) 1px, transparent 1px), linear-gradient(90deg, var(--brand-foreground) 1px, transparent 1px)`,
           backgroundSize: '40px 40px'
         }}
       ></div>
@@ -37,7 +37,7 @@ const Testimonials = () => {
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#F59E0B] text-sm font-bold mb-6 uppercase tracking-wider">
+          <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-brand-accent text-sm font-bold mb-6 uppercase tracking-wider">
             Testimonials
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
@@ -55,7 +55,7 @@ const Testimonials = () => {
               {/* Stars */}
               <div className="flex gap-1 mb-6">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B]" />
+                  <Star key={i} className="w-5 h-5 fill-brand-accent text-brand-accent" />
                 ))}
               </div>
               
@@ -69,7 +69,7 @@ const Testimonials = () => {
               
               {/* Author */}
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#F59E0B] flex items-center justify-center text-[#011C6B] font-bold text-lg shrink-0">
+                <div className="w-12 h-12 rounded-full bg-brand-accent flex items-center justify-center text-brand font-bold text-lg shrink-0">
                   {testimonial.initials}
                 </div>
                 <div>

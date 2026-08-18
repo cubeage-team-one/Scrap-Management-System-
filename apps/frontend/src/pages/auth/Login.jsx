@@ -18,7 +18,7 @@ import {
 } from "../../core/constants/routes.constant";
 
 const inputStyle =
-  "h-12 w-full rounded-xl border border-[#D9E1EC] bg-[#F9FAFC] px-4 text-sm outline-none focus:border-[#123B73] focus:bg-white focus:ring-4 focus:ring-blue-100";
+  "h-12 w-full rounded-xl border border-border bg-surface-muted px-4 text-sm outline-none focus:border-brand focus:bg-white focus:ring-4 focus:ring-blue-100";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -51,13 +51,13 @@ const Login = () => {
   };
 
   return (
-    <main className="min-h-screen bg-[#F4F7FC] flex items-center justify-center p-4">
+    <main className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-xl lg:grid lg:grid-cols-2">
 
         {/* Left */}
-        <div className="relative hidden min-h-[600px] bg-[#123B73] p-10 text-white lg:flex lg:flex-col lg:justify-between">
+        <div className="relative hidden min-h-[600px] bg-brand p-10 text-white lg:flex lg:flex-col lg:justify-between">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-white p-3 text-[#123B73]">
+            <div className="rounded-xl bg-white p-3 text-brand">
               <Recycle size={25} />
             </div>
             <div>
@@ -97,10 +97,10 @@ const Login = () => {
           <div className="w-full max-w-md">
 
             <div className="mb-8">
-              <p className="text-sm font-bold text-[#123B73]">
+              <p className="text-sm font-bold text-brand">
                 WELCOME BACK
               </p>
-              <h2 className="mt-2 text-3xl font-bold text-[#14213D]">
+              <h2 className="mt-2 text-3xl font-bold text-foreground">
                 Login to your account
               </h2>
               <p className="mt-2 text-sm text-gray-500">
@@ -140,7 +140,7 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={() => navigate(RoutePath.FORGOT_PASSWORD)}
-                    className="text-xs font-semibold text-[#123B73]"
+                    className="text-xs font-semibold text-brand"
                   >
                     Forgot Password?
                   </button>
@@ -181,7 +181,7 @@ const Login = () => {
               <Button
                 type="submit"
                 disabled={loading}
-                className="!flex !h-12 !w-full !items-center !justify-center !rounded-xl !bg-[#F4C542] !font-bold !text-[#14213D]"
+                className="!flex !h-12 !w-full !items-center !justify-center !rounded-xl !bg-brand-accent !font-bold !text-foreground"
               >
                 {loading ? "Logging in..." : "Login"}
                 {!loading && <ArrowRight size={18} className="ml-2" />}
@@ -192,7 +192,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => navigate(RoutePath.SIGNUP)}
-                  className="font-bold text-[#123B73]"
+                  className="font-bold text-brand"
                 >
                   Create Account
                 </button>

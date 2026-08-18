@@ -1,4 +1,4 @@
-import { X, Package, MapPin, Scale, DollarSign, Layers, Tag, CheckCircle2, QrCode, Share2, Printer, ExternalLink } from "lucide-react";
+import { X, Package, MapPin, Scale, DollarSign, QrCode, Printer } from "lucide-react";
 
 const MyScrapViewModal = ({ isOpen, onClose, scrapItem, onEdit }) => {
   if (!isOpen || !scrapItem) return null;

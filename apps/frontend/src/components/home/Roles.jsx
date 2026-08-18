@@ -3,7 +3,7 @@ import { Factory, Users, ShoppingCart, Shield, CheckCircle2, ArrowRight } from "
 const roles = [
   {
     title: "Industry",
-    icon: <Factory className="w-6 h-6 text-[#011C6B]" />,
+    icon: <Factory className="w-6 h-6 text-brand" />,
     iconBg: "bg-blue-50",
     description: "Manufacturers, factories, and production plants listing surplus or post-process scrap for maximum recovery.",
     features: [
@@ -14,12 +14,12 @@ const roles = [
     ],
     buttonText: "Join as Industry",
     buttonBg: "bg-blue-50 hover:bg-blue-100",
-    buttonColor: "text-[#011C6B]",
-    checkColor: "text-[#011C6B]"
+    buttonColor: "text-brand",
+    checkColor: "text-brand"
   },
   {
     title: "Dealer",
-    icon: <Users className="w-6 h-6 text-[#011C6B]" />,
+    icon: <Users className="w-6 h-6 text-brand" />,
     iconBg: "bg-blue-50",
     description: "Scrap dealers who buy from industries and resell to processors — unified buying and selling in one dashboard.",
     features: [
@@ -30,8 +30,8 @@ const roles = [
     ],
     buttonText: "Join as Dealer",
     buttonBg: "bg-blue-50 hover:bg-blue-100",
-    buttonColor: "text-[#011C6B]",
-    checkColor: "text-[#011C6B]"
+    buttonColor: "text-brand",
+    checkColor: "text-brand"
   },
   {
     title: "Buyer",
@@ -69,17 +69,17 @@ const roles = [
 
 const Roles = () => {
   return (
-    <section id="roles" className="bg-[#F8FAFC] py-24">
+    <section id="roles" className="bg-muted py-24">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-100 text-[#011C6B] text-sm font-semibold mb-6 uppercase tracking-wider">
+          <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-100 text-brand text-sm font-semibold mb-6 uppercase tracking-wider">
             Roles
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-[#111827] leading-tight">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
             Built for every <br />
-            <span className="text-[#011C6B]">stakeholder in the chain</span>
+            <span className="text-brand">stakeholder in the chain</span>
           </h2>
         </div>
 
@@ -94,7 +94,7 @@ const Roles = () => {
                 {role.icon}
               </div>
               
-              <h3 className="text-2xl font-bold text-[#111827] mb-3">
+              <h3 className="text-2xl font-bold text-foreground mb-3">
                 {role.title}
               </h3>
               
@@ -111,7 +111,7 @@ const Roles = () => {
                 ))}
               </ul>
               
-              <a href={`/signup?role=${role.title.toLowerCase()}`} className={`w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#011C6B] focus-visible:ring-offset-2 ${role.buttonBg} ${role.buttonColor}`}>
+              <a href={`/signup?role=${role.title.toLowerCase()}`} className={`w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${role.buttonBg} ${role.buttonColor}`}>
                 {role.buttonText} <ArrowRight className="w-4 h-4" />
               </a>
             </div>

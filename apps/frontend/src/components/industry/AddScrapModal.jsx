@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, Package, Tag, Scale, DollarSign, Layers, Plus } from "lucide-react";
 
 const AddScrapModal = ({ isOpen, onClose, onAddScrap, initialMode = "B2B Marketplace" }) => {
@@ -12,12 +12,6 @@ const AddScrapModal = ({ isOpen, onClose, onAddScrap, initialMode = "B2B Marketp
     mode: initialMode,
     description: "",
   });
-
-  useEffect(() => {
-    if (initialMode) {
-      setFormData((prev) => ({ ...prev, mode: initialMode }));
-    }
-  }, [initialMode, isOpen]);
 
   if (!isOpen) return null;
 

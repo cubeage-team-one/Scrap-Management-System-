@@ -2,12 +2,12 @@ import { ArrowRight, Play, TrendingUp, Gavel } from "lucide-react";
 
 const Hero = () => {
   return (
-    <section className="relative bg-[#011C6B] text-white overflow-hidden min-h-[90vh] flex items-center">
+    <section className="relative bg-brand text-white overflow-hidden min-h-[90vh] flex items-center">
       {/* Background Grid Pattern */}
       <div 
         className="absolute inset-0 opacity-20 pointer-events-none" 
         style={{
-          backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px)',
+          backgroundImage: 'linear-gradient(var(--brand-foreground) 1px, transparent 1px), linear-gradient(90deg, var(--brand-foreground) 1px, transparent 1px)',
           backgroundSize: '40px 40px'
         }}
       ></div>
@@ -18,14 +18,14 @@ const Hero = () => {
           {/* Left Column: Content */}
           <div className="max-w-2xl">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-[#F59E0B] text-sm font-medium mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-brand-accent text-sm font-medium mb-8">
               <span>♻️</span> India's #1 Industrial Scrap Management Platform
             </div>
 
             {/* Headline */}
             <h1 className="text-5xl lg:text-7xl font-bold leading-[1.1] mb-6 tracking-tight">
-              Digitize Your <span className="text-[#F59E0B]">Scrap</span> <br />
-              <span className="text-[#F59E0B]">Lifecycle</span> <br />
+              Digitize Your <span className="text-brand-accent">Scrap</span> <br />
+              <span className="text-brand-accent">Lifecycle</span> <br />
               End to End
             </h1>
 
@@ -39,10 +39,10 @@ const Hero = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap items-center gap-4 mb-12">
-              <a href="/signup" className="px-8 py-4 rounded-xl bg-[#F59E0B] text-[#111827] font-semibold flex items-center gap-2 hover:bg-[#F59E0B]/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F59E0B] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011C6B] transition-all hover:-translate-y-0.5 active:scale-95 shadow-[0_0_20px_rgba(245,158,11,0.3)] w-fit">
+              <a href="/signup" className="px-8 py-4 rounded-xl bg-brand-accent text-foreground font-semibold flex items-center gap-2 hover:bg-brand-accent/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 focus-visible:ring-offset-brand transition-all hover:-translate-y-0.5 active:scale-95 shadow-[0_0_20px_color-mix(in_oklch,var(--brand-accent)_30%,transparent)] w-fit">
                 Start Free Trial <ArrowRight className="w-5 h-5" />
               </a>
-              <a href="/signup" className="px-8 py-4 rounded-xl border border-white/20 font-semibold flex items-center gap-2 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#011C6B] transition-all hover:-translate-y-0.5 active:scale-95 w-fit">
+              <a href="/signup" className="px-8 py-4 rounded-xl border border-white/20 font-semibold flex items-center gap-2 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand transition-all hover:-translate-y-0.5 active:scale-95 w-fit">
                 <Play className="w-5 h-5 fill-current" /> Watch Demo
               </a>
             </div>
@@ -51,14 +51,14 @@ const Hero = () => {
             <div className="flex items-center gap-6">
               <div className="flex -space-x-3">
                 {/* Avatars */}
-                <div className="w-10 h-10 rounded-full border-2 border-[#011C6B] bg-emerald-500 flex items-center justify-center text-xs font-bold">RM</div>
-                <div className="w-10 h-10 rounded-full border-2 border-[#011C6B] bg-blue-500 flex items-center justify-center text-xs font-bold">PS</div>
-                <div className="w-10 h-10 rounded-full border-2 border-[#011C6B] bg-purple-500 flex items-center justify-center text-xs font-bold">AG</div>
-                <div className="w-10 h-10 rounded-full border-2 border-[#011C6B] bg-pink-500 flex items-center justify-center text-xs font-bold">SK</div>
-                <div className="w-10 h-10 rounded-full border-2 border-[#011C6B] bg-red-500 flex items-center justify-center text-xs font-bold">NP</div>
+                <div className="w-10 h-10 rounded-full border-2 border-brand bg-emerald-500 flex items-center justify-center text-xs font-bold">RM</div>
+                <div className="w-10 h-10 rounded-full border-2 border-brand bg-blue-500 flex items-center justify-center text-xs font-bold">PS</div>
+                <div className="w-10 h-10 rounded-full border-2 border-brand bg-purple-500 flex items-center justify-center text-xs font-bold">AG</div>
+                <div className="w-10 h-10 rounded-full border-2 border-brand bg-pink-500 flex items-center justify-center text-xs font-bold">SK</div>
+                <div className="w-10 h-10 rounded-full border-2 border-brand bg-red-500 flex items-center justify-center text-xs font-bold">NP</div>
               </div>
               <div>
-                <div className="flex items-center gap-1 text-[#F59E0B] mb-1">
+                <div className="flex items-center gap-1 text-brand-accent mb-1">
                   {'★★★★★'.split('').map((star, i) => <span key={i}>{star}</span>)}
                   <span className="text-white font-bold ml-1">4.9</span>
                 </div>
@@ -72,7 +72,7 @@ const Hero = () => {
           {/* Right Column: UI Mockup */}
           <div className="relative w-full aspect-[4/3] hidden lg:block">
             {/* Main Browser Window */}
-            <div className="absolute inset-0 bg-[#111827] rounded-xl border border-gray-800 shadow-2xl overflow-hidden flex flex-col">
+            <div className="absolute inset-0 bg-foreground rounded-xl border border-gray-800 shadow-2xl overflow-hidden flex flex-col">
               {/* Browser Header */}
               <div className="h-10 bg-gray-900 border-b border-gray-800 flex items-center px-4 gap-2">
                 <div className="flex gap-1.5">
@@ -197,7 +197,7 @@ const Hero = () => {
                 <Gavel className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <div className="text-sm font-bold text-[#111827]">Live Auction</div>
+                <div className="text-sm font-bold text-foreground">Live Auction</div>
                 <div className="text-xs text-gray-500">₹37,800/MT · 14 bidders</div>
               </div>
             </div>
