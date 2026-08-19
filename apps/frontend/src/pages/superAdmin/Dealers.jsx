@@ -4,26 +4,18 @@ import {
   SlidersHorizontal,
   Download,
   Filter,
-  MoreHorizontal,
   ChevronRight,
-  ChevronLeft,
   ChevronDown,
   Check,
   CheckCircle2,
   AlertCircle,
-  X,
-  Eye,
-  Edit2,
   Trash2,
   Plus,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-  ShieldCheck,
-  Building2,
   RotateCcw,
 } from "lucide-react";
 
+import MaterialTable from "../../components/common/MaterialTable";
+import { dealersRegistryTableConfig } from "../../configs/tables/dealersRegistryTable.config";
 import OnboardDealerModal from "../../components/superAdmin/OnboardDealerModal";
 import DealerViewModal from "../../components/superAdmin/DealerViewModal";
 import DealerEditModal from "../../components/superAdmin/DealerEditModal";
@@ -274,12 +266,6 @@ const LOCATION_FILTER_OPTIONS = [
   { value: "KA", label: "Karnataka (KA)" },
 ];
 
-const PAGE_SIZE_OPTIONS = [
-  { value: 5, label: "5 per page" },
-  { value: 10, label: "10 per page" },
-  { value: 20, label: "20 per page" },
-];
-
 const Dealers = () => {
   // --- Data State ---
   const [dealers, setDealers] = useState(INITIAL_DEALERS);
@@ -292,21 +278,10 @@ const Dealers = () => {
   const [stateFilter, setStateFilter] = useState("All locations");
   const [showExtendedFilters, setShowExtendedFilters] = useState(false);
 
-  // --- Sorting State ---
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-
-  // --- Pagination State ---
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
-
   // --- Modals State ---
   const [isOnboardModalOpen, setIsOnboardModalOpen] = useState(false);
   const [viewingDealer, setViewingDealer] = useState(null);
   const [editingDealer, setEditingDealer] = useState(null);
-
-  // --- Actions Dropdown State ---
-  const [openActionMenuId, setOpenActionMenuId] = useState(null);
-  const actionMenuRef = useRef(null);
 
   // --- Toast Notification ---
   const [toastMessage, setToastMessage] = useState("");
@@ -315,17 +290,6 @@ const Dealers = () => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(""), 3500);
   };
-
-  // Close row action menus when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (actionMenuRef.current && !actionMenuRef.current.contains(event.target)) {
-        setOpenActionMenuId(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   // --- Filtering Logic ---
   const filteredDealers = useMemo(() => {
@@ -353,86 +317,18 @@ const Dealers = () => {
     });
   }, [dealers, searchQuery, statusFilter, specialisationFilter, stateFilter]);
 
-  // --- Sorting Logic ---
-  const sortedDealers = useMemo(() => {
-    if (!sortConfig.key) return filteredDealers;
+  // Row selection state, adapted between MaterialTable's { [id]: true } shape
+  // (used by Material React Table's built-in checkbox column) and the plain
+  // `selectedIds` array that the rest of this page's bulk-action logic uses.
+  const rowSelection = useMemo(
+    () => Object.fromEntries(selectedIds.map((id) => [id, true])),
+    [selectedIds]
+  );
 
-    return [...filteredDealers].sort((a, b) => {
-      let aVal = a[sortConfig.key];
-      let bVal = b[sortConfig.key];
-
-      if (sortConfig.key === "purchaseValue") {
-        aVal = a.purchaseValueRaw || 0;
-        bVal = b.purchaseValueRaw || 0;
-      }
-
-      if (typeof aVal === "string") {
-        return sortConfig.direction === "asc"
-          ? aVal.localeCompare(bVal)
-          : bVal.localeCompare(aVal);
-      }
-
-      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-      return 0;
-    });
-  }, [filteredDealers, sortConfig]);
-
-  // --- Pagination Slice ---
-  const totalItems = sortedDealers.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-  const paginatedDealers = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return sortedDealers.slice(start, start + pageSize);
-  }, [sortedDealers, currentPage, pageSize]);
-
-  // Adjust current page if out of bounds after filtering
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [currentPage, totalPages]);
-
-  // --- Sort Handler ---
-  const handleSort = (key) => {
-    setSortConfig((prev) => {
-      if (prev.key === key) {
-        if (prev.direction === "asc") return { key, direction: "desc" };
-        return { key: null, direction: "asc" };
-      }
-      return { key, direction: "asc" };
-    });
-  };
-
-  const getSortIcon = (key) => {
-    if (sortConfig.key !== key) {
-      return <ArrowUpDown className="w-3 h-3 text-slate-400 group-hover:text-slate-700" />;
-    }
-    return sortConfig.direction === "asc" ? (
-      <ArrowUp className="w-3 h-3 text-blue-600" />
-    ) : (
-      <ArrowDown className="w-3 h-3 text-blue-600" />
-    );
-  };
-
-  // --- Selection Logic ---
-  const isAllSelected =
-    paginatedDealers.length > 0 && paginatedDealers.every((d) => selectedIds.includes(d.id));
-
-  const handleToggleSelectAll = () => {
-    if (isAllSelected) {
-      const pageIds = paginatedDealers.map((d) => d.id);
-      setSelectedIds((prev) => prev.filter((id) => !pageIds.includes(id)));
-    } else {
-      const pageIds = paginatedDealers.map((d) => d.id);
-      setSelectedIds((prev) => Array.from(new Set([...prev, ...pageIds])));
-    }
-  };
-
-  const handleToggleSelectRow = (id) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+  const handleRowSelectionChange = (updaterOrValue) => {
+    const nextSelection =
+      typeof updaterOrValue === "function" ? updaterOrValue(rowSelection) : updaterOrValue;
+    setSelectedIds(Object.keys(nextSelection).filter((id) => nextSelection[id]));
   };
 
   // --- CRUD Actions ---
@@ -451,17 +347,14 @@ const Dealers = () => {
       prev.map((d) => (d.id === id ? { ...d, status: newStatus } : d))
     );
     showToast(`Status updated to ${newStatus}`);
-    setOpenActionMenuId(null);
   };
 
-  const handleDeleteDealer = (id) => {
-    const target = dealers.find((d) => d.id === id);
-    if (window.confirm(`Are you sure you want to remove ${target?.name || "this dealer"}?`)) {
-      setDealers((prev) => prev.filter((d) => d.id !== id));
-      setSelectedIds((prev) => prev.filter((item) => item !== id));
-      showToast(`Removed dealer from registry.`);
-      setOpenActionMenuId(null);
-    }
+  // MaterialTable shows its own confirmation dialog before calling this, so
+  // no window.confirm is needed here.
+  const handleDeleteDealer = (dealer) => {
+    setDealers((prev) => prev.filter((d) => d.id !== dealer.id));
+    setSelectedIds((prev) => prev.filter((item) => item !== dealer.id));
+    showToast(`Removed dealer from registry.`);
   };
 
   const handleBulkStatus = (status) => {
@@ -635,7 +528,7 @@ const Dealers = () => {
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Specialisation Filter */}
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1">
@@ -643,10 +536,7 @@ const Dealers = () => {
               </label>
               <CustomDropdown
                 value={specialisationFilter}
-                onChange={(val) => {
-                  setSpecialisationFilter(val);
-                  setCurrentPage(1);
-                }}
+                onChange={setSpecialisationFilter}
                 options={SPECIALISATION_FILTER_OPTIONS}
                 menuAlign="left"
               />
@@ -659,27 +549,8 @@ const Dealers = () => {
               </label>
               <CustomDropdown
                 value={stateFilter}
-                onChange={(val) => {
-                  setStateFilter(val);
-                  setCurrentPage(1);
-                }}
+                onChange={setStateFilter}
                 options={LOCATION_FILTER_OPTIONS}
-                menuAlign="left"
-              />
-            </div>
-
-            {/* Rows Per Page */}
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1">
-                Display Per Page
-              </label>
-              <CustomDropdown
-                value={pageSize}
-                onChange={(val) => {
-                  setPageSize(Number(val));
-                  setCurrentPage(1);
-                }}
-                options={PAGE_SIZE_OPTIONS}
                 menuAlign="left"
               />
             </div>
@@ -716,6 +587,14 @@ const Dealers = () => {
 
             <button
               type="button"
+              onClick={() => handleBulkStatus("Rejected")}
+              className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+            >
+              <AlertCircle className="w-3.5 h-3.5" /> Reject
+            </button>
+
+            <button
+              type="button"
               onClick={handleBulkDelete}
               className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
             >
@@ -733,369 +612,56 @@ const Dealers = () => {
         </div>
       )}
 
-      {/* ================= 5. MAIN TABLE CARD ================= */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-2xs">
-        {/* Table Top Controls: Search, Status Dropdown & Export */}
-        <div className="p-3.5 sm:p-4 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {/* Search Input (Exact Figma placeholder and design) */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full pl-9 pr-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-2xs"
-            />
-          </div>
-
-          {/* Right Controls: Custom Status Dropdown + Export Button */}
-          <div className="flex items-center gap-2.5">
-            {/* Custom Status Dropdown (Replacing native ugly select) */}
-            <CustomDropdown
-              value={statusFilter}
-              onChange={(val) => {
-                setStatusFilter(val);
-                setCurrentPage(1);
-              }}
-              options={STATUS_FILTER_OPTIONS}
-              icon={Filter}
-              className="min-w-[140px]"
-              menuAlign="right"
-            />
-
-            {/* Export Button */}
-            <button
-              type="button"
-              onClick={handleExportCSV}
-              className="px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-medium flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
-            >
-              <Download className="w-3.5 h-3.5 text-slate-600" />
-              <span>Export</span>
-            </button>
-          </div>
+      {/* ================= 5. SEARCH & FILTER BAR ================= */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-2xs p-3.5 sm:p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        {/* Search Input (Exact Figma placeholder and design) */}
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-2xs"
+          />
         </div>
 
-        {/* Table View */}
-        <div className="overflow-x-auto w-full">
-          <table className="w-full text-left border-collapse min-w-[760px]">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/40 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                {/* Selection Checkbox */}
-                <th className="py-3 px-4 w-12 text-center">
-                  <button
-                    type="button"
-                    onClick={handleToggleSelectAll}
-                    className="w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center cursor-pointer hover:border-slate-400 transition-colors"
-                  >
-                    {isAllSelected && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-blue-600" />
-                    )}
-                  </button>
-                </th>
+        {/* Right Controls: Custom Status Dropdown + Export Button */}
+        <div className="flex items-center gap-2.5">
+          {/* Custom Status Dropdown (Replacing native ugly select) */}
+          <CustomDropdown
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={STATUS_FILTER_OPTIONS}
+            icon={Filter}
+            className="min-w-[140px]"
+            menuAlign="right"
+          />
 
-                {/* Dealer Column */}
-                <th
-                  onClick={() => handleSort("name")}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-800 transition-colors group select-none"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Dealer</span>
-                    {getSortIcon("name")}
-                  </div>
-                </th>
-
-                {/* Specialisation Column */}
-                <th
-                  onClick={() => handleSort("specialisation")}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-800 transition-colors group select-none"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Specialisation</span>
-                    {getSortIcon("specialisation")}
-                  </div>
-                </th>
-
-                {/* Location Column */}
-                <th className="py-3 px-4 select-none">LOCATION</th>
-
-                {/* Purchase Value Column */}
-                <th
-                  onClick={() => handleSort("purchaseValue")}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-800 transition-colors group select-none"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Purchase value</span>
-                    {getSortIcon("purchaseValue")}
-                  </div>
-                </th>
-
-                {/* Status Column */}
-                <th className="py-3 px-4 select-none">STATUS</th>
-
-                {/* Date Column */}
-                <th
-                  onClick={() => handleSort("date")}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-800 transition-colors group select-none"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Date</span>
-                    {getSortIcon("date")}
-                  </div>
-                </th>
-
-                {/* Actions Column */}
-                <th className="py-3 px-4 w-12 text-center select-none"></th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-slate-100 text-xs sm:text-sm">
-              {paginatedDealers.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="py-12 text-center text-slate-400">
-                    <Building2 className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                    <p className="text-xs font-semibold">No scrap dealers found</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">
-                      Try adjusting your search query or filters
-                    </p>
-                  </td>
-                </tr>
-              ) : (
-                paginatedDealers.map((dealer) => {
-                  const isSelected = selectedIds.includes(dealer.id);
-
-                  return (
-                    <tr
-                      key={dealer.id}
-                      className={`hover:bg-slate-50/80 transition-colors group ${
-                        isSelected ? "bg-blue-50/30" : ""
-                      }`}
-                    >
-                      {/* Checkbox (Circle outline matching Figma design) */}
-                      <td className="py-3.5 px-4 text-center">
-                        <button
-                          type="button"
-                          onClick={() => handleToggleSelectRow(dealer.id)}
-                          className={`w-4 h-4 rounded-full border flex items-center justify-center cursor-pointer transition-colors ${
-                            isSelected
-                              ? "border-blue-600 bg-blue-600 text-white"
-                              : "border-slate-300 hover:border-slate-400"
-                          }`}
-                        >
-                          {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                        </button>
-                      </td>
-
-                      {/* Dealer Column: Initials Box + Name + Code */}
-                      <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-slate-600 font-bold text-xs shrink-0">
-                            {dealer.initials || "DL"}
-                          </div>
-                          <div>
-                            <div
-                              onClick={() => setViewingDealer(dealer)}
-                              className="font-semibold text-slate-900 hover:text-blue-600 transition-colors cursor-pointer"
-                            >
-                              {dealer.name}
-                            </div>
-                            <div className="text-[11px] text-slate-400 font-mono">
-                              {dealer.code}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Specialisation Column */}
-                      <td className="py-3.5 px-4 text-slate-600 font-medium">
-                        {dealer.specialisation}
-                      </td>
-
-                      {/* Location Column */}
-                      <td className="py-3.5 px-4 text-slate-600 font-medium">
-                        {dealer.location}
-                      </td>
-
-                      {/* Purchase Value Column (Bold with Currency) */}
-                      <td className="py-3.5 px-4 font-bold text-slate-900 whitespace-nowrap">
-                        {dealer.purchaseValue}
-                      </td>
-
-                      {/* Status Badges (Exact Figma Pill Styling) */}
-                      <td className="py-3.5 px-4 whitespace-nowrap">
-                        {dealer.status === "Approved" && (
-                          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200">
-                            Approved
-                          </span>
-                        )}
-                        {dealer.status === "Pending" && (
-                          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                            Pending
-                          </span>
-                        )}
-                        {dealer.status === "Rejected" && (
-                          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-600 border border-rose-200">
-                            Rejected
-                          </span>
-                        )}
-                        {!["Approved", "Pending", "Rejected"].includes(dealer.status) && (
-                          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
-                            {dealer.status}
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Date Column */}
-                      <td className="py-3.5 px-4 text-slate-500 font-medium whitespace-nowrap">
-                        {dealer.date}
-                      </td>
-
-                      {/* Actions Menu (Three dots) */}
-                      <td className="py-3.5 px-4 text-center relative">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenActionMenuId(
-                              openActionMenuId === dealer.id ? null : dealer.id
-                            );
-                          }}
-                          className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                        >
-                          <MoreHorizontal className="w-4 h-4" />
-                        </button>
-
-                        {/* Floating Action Menu */}
-                        {openActionMenuId === dealer.id && (
-                          <div
-                            ref={actionMenuRef}
-                            className="absolute right-4 top-10 z-30 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 text-xs text-left animate-in fade-in zoom-in-95 duration-100"
-                          >
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setViewingDealer(dealer);
-                                setOpenActionMenuId(null);
-                              }}
-                              className="w-full px-3 py-1.5 flex items-center gap-2 text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-                            >
-                              <Eye className="w-3.5 h-3.5 text-slate-400" /> View Details
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditingDealer(dealer);
-                                setOpenActionMenuId(null);
-                              }}
-                              className="w-full px-3 py-1.5 flex items-center gap-2 text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-                            >
-                              <Edit2 className="w-3.5 h-3.5 text-slate-400" /> Edit Dealer
-                            </button>
-
-                            <div className="my-1 border-t border-slate-100" />
-
-                            {dealer.status !== "Approved" && (
-                              <button
-                                type="button"
-                                onClick={() => handleStatusChange(dealer.id, "Approved")}
-                                className="w-full px-3 py-1.5 flex items-center gap-2 text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer"
-                              >
-                                <CheckCircle2 className="w-3.5 h-3.5" /> Approve Dealer
-                              </button>
-                            )}
-
-                            {dealer.status !== "Rejected" && (
-                              <button
-                                type="button"
-                                onClick={() => handleStatusChange(dealer.id, "Rejected")}
-                                className="w-full px-3 py-1.5 flex items-center gap-2 text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer"
-                              >
-                                <AlertCircle className="w-3.5 h-3.5" /> Reject Dealer
-                              </button>
-                            )}
-
-                            <div className="my-1 border-t border-slate-100" />
-
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteDealer(dealer.id)}
-                              className="w-full px-3 py-1.5 flex items-center gap-2 text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" /> Delete Dealer
-                            </button>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* ================= 6. TABLE FOOTER & PAGINATION (Figma Layout) ================= */}
-        <div className="p-3.5 sm:p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          {/* Showing Count */}
-          <div>
-            Showing{" "}
-            <span className="font-semibold text-slate-700">
-              {totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1}-
-              {Math.min(currentPage * pageSize, totalItems)}
-            </span>{" "}
-            of <span className="font-semibold text-slate-700">{totalItems}</span>
-          </div>
-
-          {/* Pagination Buttons */}
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-              className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-                currentPage === 1
-                  ? "border-slate-200 text-slate-300 cursor-not-allowed bg-slate-50/50"
-                  : "border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
-              }`}
-            >
-              Previous
-            </button>
-
-            {/* Page Numbers */}
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <button
-                key={pageNum}
-                type="button"
-                onClick={() => setCurrentPage(pageNum)}
-                className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  currentPage === pageNum
-                    ? "bg-blue-600 text-white shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-100"
-                }`}
-              >
-                {pageNum}
-              </button>
-            ))}
-
-            <button
-              type="button"
-              disabled={currentPage === totalPages || totalPages === 0}
-              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-              className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-                currentPage === totalPages || totalPages === 0
-                  ? "border-slate-200 text-slate-300 cursor-not-allowed bg-slate-50/50"
-                  : "border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
-              }`}
-            >
-              Next
-            </button>
-          </div>
+          {/* Export Button */}
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-medium flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-600" />
+            <span>Export</span>
+          </button>
         </div>
       </div>
+
+      {/* ================= 6. DEALERS TABLE ================= */}
+      <MaterialTable
+        config={dealersRegistryTableConfig}
+        data={filteredDealers}
+        getRowId={(row) => row.id}
+        onView={(dealer) => setViewingDealer(dealer)}
+        onEdit={(dealer) => setEditingDealer(dealer)}
+        onDelete={handleDeleteDealer}
+        enableRowSelection
+        rowSelection={rowSelection}
+        onRowSelectionChange={handleRowSelectionChange}
+      />
 
       {/* ================= 7. MODALS ================= */}
       {isOnboardModalOpen && (

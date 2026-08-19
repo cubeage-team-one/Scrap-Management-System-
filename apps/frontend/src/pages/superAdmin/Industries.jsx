@@ -4,22 +4,16 @@ import {
   Search,
   Filter,
   Download,
-  Plus,
-  ArrowUpDown,
-  MoreHorizontal,
   ChevronRight,
-  ChevronLeft,
   ChevronDown,
   X,
   Building2,
-  CheckCircle2,
-  Clock,
-  XCircle,
-  Eye,
   Edit2,
-  Trash2,
   Check,
 } from "lucide-react";
+
+import MaterialTable from "../../components/common/MaterialTable";
+import { adminTableConfig } from "../../configs/tables/adminTable.config";
 
 const INITIAL_INDUSTRIES = [
   {
@@ -154,23 +148,15 @@ export default function Industries() {
   const [selectedStatus, setSelectedStatus] = useState("All statuses");
   const [selectedSector, setSelectedSector] = useState("All Sectors");
   const [selectedRows, setSelectedRows] = useState([]);
-  const [sortField, setSortField] = useState("date");
-  const [sortAsc, setSortAsc] = useState(false);
-
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 6;
 
   // Dropdown states
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
-  const [activeMenuId, setActiveMenuId] = useState(null);
 
   // Modal States
   const [isOnboardModalOpen, setIsOnboardModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [activeIndustry, setActiveIndustry] = useState(null);
 
   // Form State
@@ -186,17 +172,7 @@ export default function Industries() {
     gstNumber: "",
   });
 
-  // Handle Sort
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortAsc(!sortAsc);
-    } else {
-      setSortField(field);
-      setSortAsc(true);
-    }
-  };
-
-  // Filter & Sort Logic
+  // Filter Logic
   const filteredIndustries = useMemo(() => {
     let result = [...industries];
 
@@ -224,46 +200,21 @@ export default function Industries() {
       result = result.filter((item) => item.sector === selectedSector);
     }
 
-    // Sorting
-    result.sort((a, b) => {
-      let aVal = a[sortField] ?? "";
-      let bVal = b[sortField] ?? "";
-
-      if (typeof aVal === "string") {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
-      }
-
-      if (aVal < bVal) return sortAsc ? -1 : 1;
-      if (aVal > bVal) return sortAsc ? 1 : -1;
-      return 0;
-    });
-
     return result;
-  }, [industries, searchQuery, selectedStatus, selectedSector, sortField, sortAsc]);
+  }, [industries, searchQuery, selectedStatus, selectedSector]);
 
-  // Pagination calculation
-  const totalPages = Math.max(1, Math.ceil(filteredIndustries.length / pageSize));
-  const paginatedIndustries = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredIndustries.slice(start, start + pageSize);
-  }, [filteredIndustries, currentPage, pageSize]);
+  // Row selection state, adapted between MaterialTable's { [id]: true } shape
+  // (used by Material React Table's built-in checkbox column) and the plain
+  // `selectedRows` array that CSV export scoping uses.
+  const rowSelection = useMemo(
+    () => Object.fromEntries(selectedRows.map((id) => [id, true])),
+    [selectedRows]
+  );
 
-  // Selection handlers
-  const handleSelectAll = () => {
-    if (selectedRows.length === paginatedIndustries.length) {
-      setSelectedRows([]);
-    } else {
-      setSelectedRows(paginatedIndustries.map((item) => item.id));
-    }
-  };
-
-  const handleSelectRow = (id) => {
-    if (selectedRows.includes(id)) {
-      setSelectedRows(selectedRows.filter((rId) => rId !== id));
-    } else {
-      setSelectedRows([...selectedRows, id]);
-    }
+  const handleRowSelectionChange = (updaterOrValue) => {
+    const nextSelection =
+      typeof updaterOrValue === "function" ? updaterOrValue(rowSelection) : updaterOrValue;
+    setSelectedRows(Object.keys(nextSelection).filter((id) => nextSelection[id]));
   };
 
   // Status Badge Renderer using SmartScrap UI Design Tokens
@@ -434,21 +385,11 @@ export default function Industries() {
     setActiveIndustry(null);
   };
 
-  // Delete Industry
-  const handleDeleteIndustry = () => {
-    if (!activeIndustry) return;
-    setIndustries(industries.filter((item) => item.id !== activeIndustry.id));
-    setSelectedRows(selectedRows.filter((id) => id !== activeIndustry.id));
-    setIsDeleteModalOpen(false);
-    setActiveIndustry(null);
-  };
-
-  // Status quick update
-  const handleQuickStatusChange = (id, newStatus) => {
-    setIndustries(
-      industries.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
-    );
-    setActiveMenuId(null);
+  // MaterialTable shows its own confirmation dialog before calling this, so
+  // no separate confirm step is needed here.
+  const handleDeleteIndustry = (industry) => {
+    setIndustries((prev) => prev.filter((item) => item.id !== industry.id));
+    setSelectedRows((prev) => prev.filter((id) => id !== industry.id));
   };
 
   return (
@@ -511,416 +452,118 @@ export default function Industries() {
           </div>
         </div>
 
-        {/* ================= MAIN TABLE CONTAINER ================= */}
-        <div className="bg-card rounded-xl border border-border shadow-2xs overflow-hidden">
-          {/* ================= TOP TOOLBAR ================= */}
-          <div className="p-4 sm:p-5 border-b border-border flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            {/* Search Box */}
-            <div className="relative flex-1">
-              <Search
-                size={18}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
-              />
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-full pl-10 pr-9 py-2 text-sm bg-surface-muted border border-input rounded-lg placeholder:text-muted-foreground text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
-                >
-                  <X size={14} />
-                </button>
+        {/* ================= SEARCH & FILTER BAR ================= */}
+        <div className="bg-card rounded-xl border border-border shadow-2xs p-4 sm:p-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          {/* Search Box */}
+          <div className="relative flex-1">
+            <Search
+              size={18}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+            />
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-9 py-2 text-sm bg-surface-muted border border-input rounded-lg placeholder:text-muted-foreground text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          {/* Right side Toolbar actions */}
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            {/* Status Dropdown Filter */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-lg hover:bg-muted transition-colors cursor-pointer shadow-2xs"
+              >
+                <Filter size={16} className="text-muted-foreground" />
+                <span>{selectedStatus}</span>
+                <ChevronDown size={15} className="text-muted-foreground ml-0.5" />
+              </button>
+
+              {statusDropdownOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-20"
+                    onClick={() => setStatusDropdownOpen(false)}
+                  />
+                  <div className="absolute right-0 mt-2 w-44 bg-card rounded-xl shadow-lg border border-border py-1.5 z-30 animate-in fade-in zoom-in-95 duration-100">
+                    {STATUS_LIST.map((status) => (
+                      <button
+                        key={status}
+                        type="button"
+                        onClick={() => {
+                          setSelectedStatus(status);
+                          setStatusDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between transition-colors ${
+                          selectedStatus === status
+                            ? "text-primary bg-primary/10 font-semibold"
+                            : "text-foreground hover:bg-muted"
+                        }`}
+                      >
+                        <span>{status}</span>
+                        {selectedStatus === status && <Check size={15} />}
+                      </button>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
 
-            {/* Right side Toolbar actions */}
-            <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
-              {/* Status Dropdown Filter */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-lg hover:bg-muted transition-colors cursor-pointer shadow-2xs"
-                >
-                  <Filter size={16} className="text-muted-foreground" />
-                  <span>{selectedStatus}</span>
-                  <ChevronDown size={15} className="text-muted-foreground ml-0.5" />
-                </button>
-
-                {statusDropdownOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-20"
-                      onClick={() => setStatusDropdownOpen(false)}
-                    />
-                    <div className="absolute right-0 mt-2 w-44 bg-card rounded-xl shadow-lg border border-border py-1.5 z-30 animate-in fade-in zoom-in-95 duration-100">
-                      {STATUS_LIST.map((status) => (
-                        <button
-                          key={status}
-                          type="button"
-                          onClick={() => {
-                            setSelectedStatus(status);
-                            setStatusDropdownOpen(false);
-                            setCurrentPage(1);
-                          }}
-                          className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between transition-colors ${
-                            selectedStatus === status
-                              ? "text-primary bg-primary/10 font-semibold"
-                              : "text-foreground hover:bg-muted"
-                          }`}
-                        >
-                          <span>{status}</span>
-                          {selectedStatus === status && <Check size={15} />}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {/* Export Button */}
-              <button
-                type="button"
-                onClick={handleExport}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-lg hover:bg-muted transition-colors cursor-pointer shadow-2xs"
-                title="Export to CSV"
-              >
-                <Download size={16} className="text-muted-foreground" />
-                <span>Export</span>
-              </button>
-            </div>
-          </div>
-
-          {/* ================= DATA TABLE ================= */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[760px]">
-              <thead>
-                <tr className="border-b border-border text-xs font-bold text-foreground uppercase tracking-wider select-none bg-surface/50">
-                  <th className="py-3.5 px-4 w-12 text-center">
-                    <button
-                      type="button"
-                      onClick={handleSelectAll}
-                      className={`w-4.5 h-5 rounded-[6px] border-[1.5px] flex items-center justify-center transition-all cursor-pointer mx-auto ${
-                        selectedRows.length === paginatedIndustries.length &&
-                        paginatedIndustries.length > 0
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-input hover:border-primary bg-card"
-                      }`}
-                    >
-                      {selectedRows.length === paginatedIndustries.length &&
-                        paginatedIndustries.length > 0 && <Check size={12} strokeWidth={3} />}
-                    </button>
-                  </th>
-
-                  <th
-                    className="py-3.5 px-4 cursor-pointer hover:text-primary transition-colors group"
-                    onClick={() => handleSort("companyName")}
-                  >
-                    <div className="flex items-center gap-1.5 font-bold text-foreground">
-                      <span>COMPANY</span>
-                      <ArrowUpDown size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                    </div>
-                  </th>
-
-                  <th
-                    className="py-3.5 px-4 cursor-pointer hover:text-primary transition-colors group"
-                    onClick={() => handleSort("sector")}
-                  >
-                    <div className="flex items-center gap-1.5 font-bold text-foreground">
-                      <span>SECTOR</span>
-                      <ArrowUpDown size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                    </div>
-                  </th>
-
-                  <th
-                    className="py-3.5 px-4 cursor-pointer hover:text-primary transition-colors uppercase font-bold text-foreground"
-                    onClick={() => handleSort("location")}
-                  >
-                    <span>LOCATION</span>
-                  </th>
-
-                  <th
-                    className="py-3.5 px-4 cursor-pointer hover:text-primary transition-colors group"
-                    onClick={() => handleSort("tradedValue")}
-                  >
-                    <div className="flex items-center gap-1.5 font-bold text-foreground">
-                      <span>TRADED VALUE</span>
-                      <ArrowUpDown size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                    </div>
-                  </th>
-
-                  <th className="py-3.5 px-4 uppercase select-none font-bold text-foreground">
-                    <span>STATUS</span>
-                  </th>
-
-                  <th
-                    className="py-3.5 px-4 cursor-pointer hover:text-primary transition-colors group"
-                    onClick={() => handleSort("date")}
-                  >
-                    <div className="flex items-center gap-1.5 font-bold text-foreground">
-                      <span>DATE</span>
-                      <ArrowUpDown size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                    </div>
-                  </th>
-
-                  <th className="py-3.5 px-4 w-12 text-center select-none"></th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-border text-sm bg-card">
-                {paginatedIndustries.length > 0 ? (
-                  paginatedIndustries.map((row) => {
-                    const isSelected = selectedRows.includes(row.id);
-                    return (
-                      <tr
-                        key={row.id}
-                        className={`group transition-colors ${
-                          isSelected ? "bg-primary/5" : "hover:bg-muted/50"
-                        }`}
-                      >
-                        {/* Checkbox */}
-                        <td className="py-4 px-4 text-center">
-                          <button
-                            type="button"
-                            onClick={() => handleSelectRow(row.id)}
-                            className={`w-4.5 h-5 rounded-[6px] border-[1.5px] flex items-center justify-center transition-all cursor-pointer mx-auto ${
-                              isSelected
-                                ? "border-primary bg-primary text-primary-foreground"
-                                : "border-input hover:border-primary bg-card"
-                            }`}
-                          >
-                            {isSelected && <Check size={12} strokeWidth={3} />}
-                          </button>
-                        </td>
-
-                        {/* Company (Avatar + Name + Code) */}
-                        <td className="py-4 px-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary font-bold text-xs flex items-center justify-center shrink-0">
-                              {row.initials}
-                            </div>
-                            <div>
-                              <div
-                                className="font-bold text-foreground leading-tight hover:text-primary cursor-pointer transition-colors"
-                                onClick={() => {
-                                  setActiveIndustry(row);
-                                  setIsViewModalOpen(true);
-                                }}
-                              >
-                                {row.companyName}
-                              </div>
-                              <div className="text-xs text-muted-foreground font-normal mt-0.5">
-                                {row.code}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-
-                        {/* Sector */}
-                        <td className="py-4 px-4 text-foreground/90 font-normal">
-                          {row.sector}
-                        </td>
-
-                        {/* Location */}
-                        <td className="py-4 px-4 text-muted-foreground font-normal">
-                          {row.location}
-                        </td>
-
-                        {/* Traded value */}
-                        <td className="py-4 px-4 font-bold text-foreground">
-                          {row.tradedValueDisplay}
-                        </td>
-
-                        {/* Status */}
-                        <td className="py-4 px-4">
-                          {renderStatusBadge(row.status)}
-                        </td>
-
-                        {/* Date */}
-                        <td className="py-4 px-4 text-muted-foreground font-normal whitespace-nowrap">
-                          {row.date}
-                        </td>
-
-                        {/* Action Menu (···) */}
-                        <td className="py-4 px-4 text-center relative">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setActiveMenuId(activeMenuId === row.id ? null : row.id)
-                            }
-                            className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                          >
-                            <MoreHorizontal size={18} />
-                          </button>
-
-                          {activeMenuId === row.id && (
-                            <>
-                              <div
-                                className="fixed inset-0 z-20"
-                                onClick={() => setActiveMenuId(null)}
-                              />
-                              <div className="absolute right-4 top-12 w-48 bg-card rounded-xl shadow-xl border border-border py-1.5 z-30 text-left animate-in fade-in zoom-in-95 duration-100">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setActiveIndustry(row);
-                                    setIsViewModalOpen(true);
-                                    setActiveMenuId(null);
-                                  }}
-                                  className="w-full px-4 py-2 text-xs font-medium text-foreground hover:bg-muted flex items-center gap-2.5"
-                                >
-                                  <Eye size={15} className="text-muted-foreground" />
-                                  <span>View Details</span>
-                                </button>
-
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setActiveIndustry(row);
-                                    setFormData({
-                                      companyName: row.companyName,
-                                      sector: row.sector,
-                                      location: row.location,
-                                      tradedValue: row.tradedValue,
-                                      status: row.status,
-                                      contactPerson: row.contactPerson || "",
-                                      email: row.email || "",
-                                      phone: row.phone || "",
-                                      gstNumber: row.gstNumber || "",
-                                    });
-                                    setIsEditModalOpen(true);
-                                    setActiveMenuId(null);
-                                  }}
-                                  className="w-full px-4 py-2 text-xs font-medium text-foreground hover:bg-muted flex items-center gap-2.5"
-                                >
-                                  <Edit2 size={15} className="text-muted-foreground" />
-                                  <span>Edit Industry</span>
-                                </button>
-
-                                <div className="my-1 border-t border-border" />
-
-                                {row.status !== "Approved" && (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleQuickStatusChange(row.id, "Approved")}
-                                    className="w-full px-4 py-2 text-xs font-medium text-success hover:bg-success/10 flex items-center gap-2.5"
-                                  >
-                                    <CheckCircle2 size={15} />
-                                    <span>Approve</span>
-                                  </button>
-                                )}
-
-                                {row.status !== "Pending" && (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleQuickStatusChange(row.id, "Pending")}
-                                    className="w-full px-4 py-2 text-xs font-medium text-warning hover:bg-warning/10 flex items-center gap-2.5"
-                                  >
-                                    <Clock size={15} />
-                                    <span>Mark Pending</span>
-                                  </button>
-                                )}
-
-                                {row.status !== "Rejected" && (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleQuickStatusChange(row.id, "Rejected")}
-                                    className="w-full px-4 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 flex items-center gap-2.5"
-                                  >
-                                    <XCircle size={15} />
-                                    <span>Reject</span>
-                                  </button>
-                                )}
-
-                                <div className="my-1 border-t border-border" />
-
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setActiveIndustry(row);
-                                    setIsDeleteModalOpen(true);
-                                    setActiveMenuId(null);
-                                  }}
-                                  className="w-full px-4 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 flex items-center gap-2.5"
-                                >
-                                  <Trash2 size={15} />
-                                  <span>Delete</span>
-                                </button>
-                              </div>
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={8} className="py-12 text-center text-muted-foreground">
-                      <Building2 className="w-12 h-12 mx-auto text-muted-foreground/50 mb-3" />
-                      <p className="text-base font-semibold text-foreground">No industries found</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Try adjusting your search or filters to find what you are looking for.
-                      </p>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* ================= PAGINATION & FOOTER ================= */}
-          <div className="p-4 sm:px-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-muted-foreground font-medium bg-surface/30">
-            <div>
-              Showing {filteredIndustries.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}–
-              {Math.min(currentPage * pageSize, filteredIndustries.length)} of{" "}
-              {filteredIndustries.length}
-            </div>
-
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(currentPage - 1)}
-                className="px-3.5 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-              >
-                Previous
-              </button>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  type="button"
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-8 h-8 rounded-lg text-xs font-semibold flex items-center justify-center transition-colors cursor-pointer ${
-                    currentPage === page
-                      ? "bg-primary text-primary-foreground"
-                      : "text-foreground hover:bg-muted border border-border"
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-
-              <button
-                type="button"
-                disabled={currentPage === totalPages || totalPages === 0}
-                onClick={() => setCurrentPage(currentPage + 1)}
-                className="px-3.5 py-1.5 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-              >
-                Next
-              </button>
-            </div>
+            {/* Export Button */}
+            <button
+              type="button"
+              onClick={handleExport}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-lg hover:bg-muted transition-colors cursor-pointer shadow-2xs"
+              title="Export to CSV"
+            >
+              <Download size={16} className="text-muted-foreground" />
+              <span>Export</span>
+            </button>
           </div>
         </div>
+
+        {/* ================= INDUSTRIES TABLE ================= */}
+        <MaterialTable
+          config={adminTableConfig}
+          data={filteredIndustries}
+          getRowId={(row) => row.id}
+          onView={(industry) => {
+            setActiveIndustry(industry);
+            setIsViewModalOpen(true);
+          }}
+          onEdit={(industry) => {
+            setActiveIndustry(industry);
+            setFormData({
+              companyName: industry.companyName,
+              sector: industry.sector,
+              location: industry.location,
+              tradedValue: industry.tradedValue,
+              status: industry.status,
+              contactPerson: industry.contactPerson || "",
+              email: industry.email || "",
+              phone: industry.phone || "",
+              gstNumber: industry.gstNumber || "",
+            });
+            setIsEditModalOpen(true);
+          }}
+          onDelete={handleDeleteIndustry}
+          enableRowSelection
+          rowSelection={rowSelection}
+          onRowSelectionChange={handleRowSelectionChange}
+        />
       </div>
 
       {/* ================= FILTER DRAWER / MODAL ================= */}
@@ -1449,45 +1092,6 @@ export default function Industries() {
         </div>
       )}
 
-      {/* ================= DELETE CONFIRMATION MODAL ================= */}
-      {isDeleteModalOpen && activeIndustry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="fixed inset-0 bg-foreground/40 backdrop-blur-xs"
-            onClick={() => setIsDeleteModalOpen(false)}
-          />
-
-          <div className="relative w-full max-w-sm bg-card rounded-2xl shadow-2xl p-6 z-10 text-center animate-in zoom-in-95 duration-150 border border-border">
-            <div className="w-12 h-12 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mx-auto mb-4">
-              <Trash2 size={24} />
-            </div>
-
-            <h3 className="text-lg font-bold text-foreground">Delete Industry?</h3>
-            <p className="text-xs text-muted-foreground mt-2">
-              Are you sure you want to remove{" "}
-              <strong className="text-foreground">{activeIndustry.companyName}</strong>? This action
-              cannot be undone.
-            </p>
-
-            <div className="mt-6 flex items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => setIsDeleteModalOpen(false)}
-                className="px-4 py-2 text-sm font-semibold text-secondary-foreground hover:bg-secondary/80 rounded-xl transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDeleteIndustry}
-                className="px-4 py-2 text-sm font-semibold text-destructive-foreground bg-destructive hover:bg-destructive/90 rounded-xl shadow-sm transition-colors cursor-pointer"
-              >
-                Yes, Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

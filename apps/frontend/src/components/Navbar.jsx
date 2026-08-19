@@ -48,7 +48,7 @@ const Navbar = ({ dashboard = false }) => {
               SS
             </div>
             <span className="text-lg sm:text-2xl font-bold tracking-tight whitespace-nowrap">
-              SmartScrap AI
+              SmartScrap
             </span>
           </Link>
 
