@@ -80,7 +80,7 @@ export const sidebarMenus = {
       path: RoutePath.INDUSTRY_INVENTORY,
     },
     {
-      label: "Dealer Marketplace",
+      label: "Marketplace",
       icon: Package,
       path: RoutePath.INDUSTRY_DEALER_MARKETPLACE,
     },
