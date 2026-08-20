@@ -98,7 +98,7 @@ const validate = (schema, data) => {
 const createScrapSchema = Joi.object({
   categoryId: uuid.required(),
 
-  quantity: positiveNumber,
+  totalQuantityKg: positiveNumber,
 
   description: optionalString,
 
@@ -110,7 +110,7 @@ const createScrapSchema = Joi.object({
 const updateScrapSchema = Joi.object({
   categoryId: uuid.optional(),
 
-  quantity: optionalPositiveNumber,
+  totalQuantityKg: optionalPositiveNumber,
 
   description: optionalString.optional(),
 
