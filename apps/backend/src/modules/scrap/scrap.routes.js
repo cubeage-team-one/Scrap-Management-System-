@@ -1,6 +1,8 @@
 import express from 'express';
 import * as scrapController from './scrap.controller.js';
 import requireAuth from '../../core/middlewares/auth.middleware.js';
+import { allowRoles } from '../../core/middlewares/role.middleware.js';
+import { validateCreateScrap, validateUpdateScrap } from './scrap.validation.js';
 
 const router = express.Router();
 
@@ -8,7 +10,7 @@ const router = express.Router();
 router.use(requireAuth);
 
 // 1. Add Scrap
-router.post('/', scrapController.addScrap);
+router.post('/', allowRoles('INDUSTRY', 'DEALER'), validateCreateScrap, scrapController.addScrap);
 
 // 2. View/List Scrap
 router.get('/', scrapController.getScraps);
@@ -17,9 +19,9 @@ router.get('/', scrapController.getScraps);
 router.get('/:id', scrapController.getScrapById);
 
 // 4. Update Scrap
-router.put('/:id', scrapController.updateScrap);
+router.put('/:id', allowRoles('INDUSTRY', 'DEALER'), validateUpdateScrap, scrapController.updateScrap);
 
 // 5. Delete Scrap
-router.delete('/:id', scrapController.deleteScrap);
+router.delete('/:id', allowRoles('INDUSTRY', 'DEALER'), scrapController.deleteScrap);
 
 export default router;
