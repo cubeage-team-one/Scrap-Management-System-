@@ -143,6 +143,9 @@ model Organisation {
 
   accountState  AccountState   @default(PENDING)
 
+  approvedByUserId String?
+  approvedBy       User?       @relation("OrganisationApprovedBy", fields: [approvedByUserId], references: [id])
+
   users         User[]
 
   // Marketplace relationships

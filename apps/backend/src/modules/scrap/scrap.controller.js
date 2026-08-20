@@ -61,10 +61,7 @@ export const updateScrap = async (req, res) => {
     res.status(200).json({ success: true, data: updatedScrap, message: 'Scrap updated successfully' });
   } catch (error) {
     console.error('Error updating scrap:', error);
-    if (error.message.includes('not found')) {
-      return res.status(404).json({ success: false, message: error.message });
-    }
-    res.status(400).json({ success: false, message: error.message });
+    res.status(error.statusCode || 400).json({ success: false, message: error.message });
   }
 };
 
@@ -77,9 +74,6 @@ export const deleteScrap = async (req, res) => {
     res.status(200).json({ success: true, message: 'Scrap deleted successfully' });
   } catch (error) {
     console.error('Error deleting scrap:', error);
-    if (error.message.includes('not found')) {
-      return res.status(404).json({ success: false, message: error.message });
-    }
-    res.status(400).json({ success: false, message: error.message });
+    res.status(error.statusCode || 400).json({ success: false, message: error.message });
   }
 };
