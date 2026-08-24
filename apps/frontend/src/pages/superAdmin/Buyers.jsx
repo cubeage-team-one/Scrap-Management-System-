@@ -1,33 +1,52 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Search,
   SlidersHorizontal,
   Download,
   ChevronDown,
-  ArrowUpDown,
-  MoreHorizontal,
   X,
   Check,
-  CheckCircle,
-  Trash2,
+  Ban,
 } from "lucide-react";
 
-const INITIAL_BUYERS = [
-  { id: "BUY-3312", name: "Verma Recycling Pvt. Ltd.", initials: "VE", type: "Recycler", location: "Kanpur, UP", spend: 4860000, status: "Approved", date: "28 Jul 2026" },
-  { id: "BUY-3311", name: "EcoSteel Remelters", initials: "EC", type: "Steel Plant", location: "Raipur, CG", spend: 7220000, status: "Approved", date: "26 Jul 2026" },
-  { id: "BUY-3310", name: "Polymer Reclaim India", initials: "PO", type: "Plastics", location: "Vapi, GJ", spend: 1560000, status: "Pending", date: "25 Jul 2026" },
-  { id: "BUY-3309", name: "Southern Copper Refiners", initials: "SO", type: "Refinery", location: "Coimbatore, TN", spend: 9340000, status: "Approved", date: "23 Jul 2026" },
-  { id: "BUY-3308", name: "Urban Paper Mills", initials: "UR", type: "Paper", location: "Ludhiana, PB", spend: 640000, status: "Completed", date: "21 Jul 2026" },
-];
+import MaterialTable from "../../components/common/MaterialTable";
+import { buyersRegistryTableConfig } from "../../configs/tables/buyersRegistryTable.config";
+import {getBuyers, updateBuyerStatus} from "../../core/services/buyer.service";
+import Loader from "../../components/common/Loader";
 
-const STATUSES = ["All statuses", "Approved", "Pending", "Completed"];
-const TYPES = ["All types", "Recycler", "Steel Plant", "Plastics", "Refinery", "Paper"];
+const STATUSES = ["All statuses", "Approved", "Pending", "Rejected", "Suspended"];
+const TYPES = ["All types", "Recycler", "Steel Plant", "Plastics", "Refinery", "Paper", "General"];
+
+const STATUS_TO_BACKEND = {
+  Approved: "ACTIVE",
+  Pending: "PENDING",
+  Rejected: "REJECTED",
+  Suspended: "SUSPENDED",
+};
+
+const BACKEND_TO_STATUS = {
+  ACTIVE: "Approved",
+  PENDING: "Pending",
+  REJECTED: "Rejected",
+  SUSPENDED: "Suspended",
+};
 
 const money = (val) => `₹${Number(val).toLocaleString("en-IN")}`;
 
+const getInitials = (name) => {
+  const words = name.trim().split(" ");
+  return words.length > 1
+    ? (words[0][0] + words[1][0]).toUpperCase()
+    : words[0].slice(0, 2).toUpperCase();
+};
+
 const Buyers = () => {
-  const [buyers, setBuyers] = useState(INITIAL_BUYERS);
+  const [buyers, setBuyers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   // Top Filter States
   const [showFilters, setShowFilters] = useState(false);
@@ -39,18 +58,14 @@ const Buyers = () => {
     max: "",
   });
 
-  // Selection & Sort States
+  // Selection State
   const [selected, setSelected] = useState([]);
-  const [sortField, setSortField] = useState(null);
-  const [sortAsc, setSortAsc] = useState(true);
 
-  // Modals & Dynamic Menu States
-  const [actionMenu, setActionMenu] = useState(null);
+  // Modals
   const [viewBuyer, setViewBuyer] = useState(null);
   const [editBuyer, setEditBuyer] = useState(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
 
-  // Form State for Invite Buyer (Now including Email ID)
   const [inviteForm, setInviteForm] = useState({
     name: "",
     email: "",
@@ -60,131 +75,130 @@ const Buyers = () => {
     status: "Pending",
   });
 
-  const menuRef = useRef(null);
+  // Fetch buyers from the real admin endpoint
+  useEffect(() => {
+    fetchBuyers();
+  }, [page, filters.status, search]);
+
+  const fetchBuyers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const statusParam =
+        filters.status !== "All statuses" ? STATUS_TO_BACKEND[filters.status] : undefined;
+
+      const response = await getBuyers({
+        status: statusParam,
+        search: search || undefined,
+        page,
+        limit: 10,
+      });
+
+      if (response.data?.success) {
+        const mapped = response.data.data.map((org) => ({
+          id: org.id,
+          initials: getInitials(org.name),
+          name: org.name,
+          code: org.code,
+          type: org.type,
+          location: org.location,
+          gstNumber: org.gstNumber,
+          contactPerson: org.contactPerson,
+          email: org.contactEmail,
+          phone: org.contactPhone,
+          spend: org.spend || 0,
+          spendDisplay: org.spendDisplay || "₹0",
+          status: BACKEND_TO_STATUS[org.status] || org.status,
+          date: new Date(org.createdAt).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          }),
+          createdAt: org.createdAt,
+        }));
+
+        setBuyers(mapped);
+        setTotalRecords(response.data.total);
+      }
+    } catch (err) {
+      console.error("Failed to fetch buyers:", err);
+      setError(err.response?.data?.message || "Failed to fetch buyers");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Dynamic Location List
   const locationsList = useMemo(() => {
     return ["All locations", ...new Set(buyers.map((b) => b.location))];
   }, [buyers]);
 
-  // Close floating action menu on outside click
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setActionMenu(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // Filter & Search Logic
+  // Search / secondary filter logic (status is already applied server-side;
+  // this narrows further on type/location/spend without another round trip)
   const filteredData = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return buyers
-      .filter((buyer) => {
-        const matchesSearch =
-          !query ||
-          `${buyer.name} ${buyer.id} ${buyer.type} ${buyer.location}`
-            .toLowerCase()
-            .includes(query);
+    return buyers.filter((buyer) => {
+      const matchesSearch =
+        !query ||
+        `${buyer.name} ${buyer.code} ${buyer.type} ${buyer.location}`
+          .toLowerCase()
+          .includes(query);
 
-        const matchesStatus =
-          filters.status === "All statuses" || buyer.status === filters.status;
+      const matchesType = filters.type === "All types" || buyer.type === filters.type;
 
-        const matchesType =
-          filters.type === "All types" || buyer.type === filters.type;
+      const matchesLocation =
+        filters.location === "All locations" || buyer.location === filters.location;
 
-        const matchesLocation =
-          filters.location === "All locations" || buyer.location === filters.location;
+      const matchesMin = !filters.min || buyer.spend >= Number(filters.min);
+      const matchesMax = !filters.max || buyer.spend <= Number(filters.max);
 
-        const matchesMin = !filters.min || buyer.spend >= Number(filters.min);
-        const matchesMax = !filters.max || buyer.spend <= Number(filters.max);
+      return matchesSearch && matchesType && matchesLocation && matchesMin && matchesMax;
+    });
+  }, [buyers, search, filters]);
 
-        return (
-          matchesSearch &&
-          matchesStatus &&
-          matchesType &&
-          matchesLocation &&
-          matchesMin &&
-          matchesMax
-        );
-      })
-      .sort((a, b) => {
-        if (!sortField) return 0;
-        let valA = a[sortField];
-        let valB = b[sortField];
-        if (typeof valA === "string") {
-          return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
-        }
-        return sortAsc ? valA - valB : valB - valA;
-      });
-  }, [buyers, search, filters, sortField, sortAsc]);
+  // Row selection state, adapted between MaterialTable's { [id]: true } shape
+  // and the plain `selected` array used by the bulk-action bar.
+  const rowSelection = useMemo(
+    () => Object.fromEntries(selected.map((id) => [id, true])),
+    [selected]
+  );
 
-  // Checkbox Selection Logic
-  const visibleIds = filteredData.map((b) => b.id);
-  const isAllSelected =
-    filteredData.length > 0 && visibleIds.every((id) => selected.includes(id));
+  const handleRowSelectionChange = (updaterOrValue) => {
+    const next = typeof updaterOrValue === "function" ? updaterOrValue(rowSelection) : updaterOrValue;
+    setSelected(Object.keys(next).filter((id) => next[id]));
+  };
 
-  const toggleSelectAll = () => {
-    if (isAllSelected) {
-      setSelected(selected.filter((id) => !visibleIds.includes(id)));
-    } else {
-      setSelected(Array.from(new Set([...selected, ...visibleIds])));
+  // Bulk actions — wired to the real approve/reject endpoint
+  const handleApproveSelected = async () => {
+    try {
+      await Promise.all(
+        selected.map((id) => ApiService.updateBuyerStatus(id, { accountState: "ACTIVE" }))
+      );
+      setSelected([]);
+      fetchBuyers();
+    } catch (err) {
+      console.error("Failed to approve buyers:", err);
+      alert(err.response?.data?.message || "Failed to approve selected buyers.");
     }
   };
 
-  const toggleSelectRow = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
-  // Checkbox Action Bar Handlers
-  const handleApproveSelected = () => {
-    setBuyers((prev) =>
-      prev.map((b) => (selected.includes(b.id) ? { ...b, status: "Approved" } : b))
-    );
-    setSelected([]);
-  };
-
-  const handleCompletedSelected = () => {
-    setBuyers((prev) =>
-      prev.map((b) => (selected.includes(b.id) ? { ...b, status: "Completed" } : b))
-    );
-    setSelected([]);
-  };
-
-  const handleDeleteSelected = () => {
-    setBuyers((prev) => prev.filter((b) => !selected.includes(b.id)));
-    setSelected([]);
+  const handleRejectSelected = async () => {
+    try {
+      await Promise.all(
+        selected.map((id) => ApiService.updateBuyerStatus(id, { accountState: "REJECTED" }))
+      );
+      setSelected([]);
+      fetchBuyers();
+    } catch (err) {
+      console.error("Failed to reject buyers:", err);
+      alert(err.response?.data?.message || "Failed to reject selected buyers.");
+    }
   };
 
   const handleExportSelected = () => {
     alert(`Exporting ${selected.length} selected buyers...`);
-  };
-
-  // Smart Viewport Position for Row Action Menu
-  const openActionMenu = (e, buyer) => {
-    e.stopPropagation();
-    const rect = e.currentTarget.getBoundingClientRect();
-    const menuWidth = 140;
-    const menuHeight = 115;
-    const gap = 6;
-
-    const openUpward = window.innerHeight - rect.bottom < menuHeight;
-    const top = openUpward ? rect.top - menuHeight - gap : rect.bottom + gap;
-    const left = Math.min(
-      rect.right - menuWidth,
-      window.innerWidth - menuWidth - 10
-    );
-
-    setActionMenu({
-      buyer,
-      top: Math.max(8, top),
-      left: Math.max(8, left),
-    });
   };
 
   const clearFilters = () => {
@@ -198,42 +212,29 @@ const Buyers = () => {
     });
   };
 
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortAsc(!sortAsc);
-    } else {
-      setSortField(field);
-      setSortAsc(true);
-    }
-  };
-
+  // Edit modal save — no backend endpoint exists yet to update arbitrary
+  // buyer org fields (only approve/reject status), so this stays local-only.
   const handleSaveEdit = (e) => {
     e.preventDefault();
     if (!editBuyer) return;
-    setBuyers((prev) =>
-      prev.map((b) => (b.id === editBuyer.id ? editBuyer : b))
-    );
+    setBuyers((prev) => prev.map((b) => (b.id === editBuyer.id ? editBuyer : b)));
     setEditBuyer(null);
   };
 
+  // Invite modal — no backend endpoint exists yet to onboard a buyer from
+  // the admin side, so this stays local-only (same as before).
   const handleInviteSubmit = (e) => {
     e.preventDefault();
     if (!inviteForm.name || !inviteForm.email) return;
 
-    const initials = inviteForm.name
-      .split(" ")
-      .map((w) => w[0])
-      .join("")
-      .substring(0, 2)
-      .toUpperCase();
-
     const newBuyer = {
-      id: `BUY-${Math.floor(1000 + Math.random() * 9000)}`,
+      id: `local-${Date.now()}`,
       name: inviteForm.name,
-      initials: initials || "BY",
+      initials: getInitials(inviteForm.name),
       type: inviteForm.type,
       location: inviteForm.location || "Mumbai, MH",
       spend: Number(inviteForm.spend) || 0,
+      spendDisplay: money(Number(inviteForm.spend) || 0),
       status: inviteForm.status,
       date: new Date().toLocaleDateString("en-GB", {
         day: "2-digit",
@@ -253,8 +254,10 @@ const Buyers = () => {
         return "bg-[#DCFCE7] text-[#15803D] border-[#BBF7D0]";
       case "Pending":
         return "bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]";
-      case "Completed":
-        return "bg-[#D1FAE5] text-[#059669] border-[#A7F3D0]";
+      case "Rejected":
+        return "bg-[#FEE2E2] text-[#B91C1C] border-[#FECACA]";
+      case "Suspended":
+        return "bg-slate-100 text-slate-600 border-slate-200";
       default:
         return "bg-slate-100 text-slate-600 border-slate-200";
     }
@@ -262,7 +265,7 @@ const Buyers = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-3 sm:p-5 lg:p-6 text-slate-800 font-sans">
-      
+
       {/* BREADCRUMB */}
       <div className="flex items-center text-xs text-slate-400 gap-1.5 mb-2">
         <span>SmartScrap AI</span>
@@ -406,19 +409,11 @@ const Buyers = () => {
             </button>
 
             <button
-              onClick={handleCompletedSelected}
-              className="flex items-center space-x-1 px-3 py-1.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-full text-xs font-semibold transition-colors shadow-sm"
-            >
-              <CheckCircle className="w-3.5 h-3.5" />
-              <span>Completed</span>
-            </button>
-
-            <button
-              onClick={handleDeleteSelected}
+              onClick={handleRejectSelected}
               className="flex items-center space-x-1 px-3 py-1.5 bg-[#E11D48] hover:bg-[#BE123C] text-white rounded-full text-xs font-semibold transition-colors shadow-sm"
             >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Delete</span>
+              <Ban className="w-3.5 h-3.5" />
+              <span>Reject</span>
             </button>
 
             <button
@@ -431,231 +426,84 @@ const Buyers = () => {
         </div>
       )}
 
-      {/* TABLE CONTAINER CARD */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        {/* Table Toolbar */}
-        <div className="p-3 sm:p-4 border-b border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {/* Search Field */}
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search..."
-              className="w-full pl-9 pr-8 py-1.5 bg-white border border-slate-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
-            />
-            {search && (
-              <button
-                onClick={() => setSearch("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="relative flex-1 sm:flex-none">
-              <select
-                value={filters.status}
-                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                className="w-full sm:w-auto appearance-none pl-8 pr-8 py-1.5 bg-white border border-slate-200 rounded-lg text-xs sm:text-sm text-slate-700 focus:outline-none focus:border-blue-500 cursor-pointer"
-              >
-                {STATUSES.map((status) => (
-                  <option key={status} value={status}>{status}</option>
-                ))}
-              </select>
-              <SlidersHorizontal className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-              <ChevronDown className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-            </div>
-
+      {/* TOOLBAR */}
+      <div className="bg-white border border-slate-200 rounded-t-xl p-3 sm:p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search..."
+            className="w-full pl-9 pr-8 py-1.5 bg-white border border-slate-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
+          />
+          {search && (
             <button
-              onClick={() => alert("Exporting buyer list...")}
-              className="flex items-center space-x-1.5 px-3 py-1.5 border border-slate-200 bg-white rounded-lg text-xs sm:text-sm text-slate-700 hover:bg-slate-50 transition-colors whitespace-nowrap"
+              onClick={() => setSearch("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
             >
-              <Download className="w-4 h-4 text-slate-500" />
-              <span>Export</span>
+              <X className="w-4 h-4" />
             </button>
-          </div>
+          )}
         </div>
 
-        {/* Scrollable Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[800px]">
-            <thead>
-              <tr className="bg-slate-50/70 border-b border-slate-200 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                <th className="p-3.5 sm:p-4 w-10">
-                  <input
-                    type="checkbox"
-                    checked={isAllSelected}
-                    onChange={toggleSelectAll}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-4 w-4 cursor-pointer"
-                  />
-                </th>
-                <th onClick={() => handleSort("name")} className="p-3.5 sm:p-4 cursor-pointer hover:text-slate-800">
-                  <div className="flex items-center space-x-1">
-                    <span>Buyer</span>
-                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
-                  </div>
-                </th>
-                <th onClick={() => handleSort("type")} className="p-3.5 sm:p-4 cursor-pointer hover:text-slate-800">
-                  <div className="flex items-center space-x-1">
-                    <span>Type</span>
-                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
-                  </div>
-                </th>
-                <th className="p-3.5 sm:p-4">LOCATION</th>
-                <th onClick={() => handleSort("spend")} className="p-3.5 sm:p-4 cursor-pointer hover:text-slate-800">
-                  <div className="flex items-center space-x-1">
-                    <span>Spend</span>
-                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
-                  </div>
-                </th>
-                <th className="p-3.5 sm:p-4">STATUS</th>
-                <th onClick={() => handleSort("date")} className="p-3.5 sm:p-4 cursor-pointer hover:text-slate-800">
-                  <div className="flex items-center space-x-1">
-                    <span>Date</span>
-                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
-                  </div>
-                </th>
-                <th className="p-3.5 sm:p-4 w-10"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-xs sm:text-sm text-slate-700">
-              {filteredData.length > 0 ? (
-                filteredData.map((buyer) => {
-                  const isSelected = selected.includes(buyer.id);
-                  return (
-                    <tr
-                      key={buyer.id}
-                      className={`hover:bg-slate-50 transition-colors ${
-                        isSelected ? "bg-blue-50/50" : ""
-                      }`}
-                    >
-                      <td className="p-3.5 sm:p-4">
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleSelectRow(buyer.id)}
-                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-4 w-4 cursor-pointer"
-                        />
-                      </td>
-
-                      <td className="p-3.5 sm:p-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded bg-slate-100 border border-slate-200 text-slate-600 font-semibold text-xs flex items-center justify-center flex-shrink-0">
-                            {buyer.initials}
-                          </div>
-                          <div>
-                            <div className="font-semibold text-slate-900 leading-snug">
-                              {buyer.name}
-                            </div>
-                            <div className="text-xs text-slate-400 font-mono">
-                              {buyer.id}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="p-3.5 sm:p-4 text-slate-600 font-medium">{buyer.type}</td>
-                      <td className="p-3.5 sm:p-4 text-slate-600">{buyer.location}</td>
-                      <td className="p-3.5 sm:p-4 font-semibold text-slate-900">{money(buyer.spend)}</td>
-
-                      <td className="p-3.5 sm:p-4">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border ${getStatusBadge(
-                            buyer.status
-                          )}`}
-                        >
-                          {buyer.status}
-                        </span>
-                      </td>
-
-                      <td className="p-3.5 sm:p-4 text-slate-500 text-xs">{buyer.date}</td>
-
-                      <td className="p-3.5 sm:p-4 text-right">
-                        <button
-                          onClick={(e) => openActionMenu(e, buyer)}
-                          className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
-                        >
-                          <MoreHorizontal className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan="8" className="p-8 text-center text-slate-400 text-xs sm:text-sm">
-                    No buyers found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Footer Pagination */}
-        <div className="p-3.5 sm:p-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
-          <div>
-            Showing 1–{filteredData.length} of {buyers.length}
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="relative flex-1 sm:flex-none">
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+              className="w-full sm:w-auto appearance-none pl-8 pr-8 py-1.5 bg-white border border-slate-200 rounded-lg text-xs sm:text-sm text-slate-700 focus:outline-none focus:border-blue-500 cursor-pointer"
+            >
+              {STATUSES.map((status) => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+            <SlidersHorizontal className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            <ChevronDown className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
 
-          <div className="flex items-center space-x-1">
-            <button disabled className="px-2.5 sm:px-3 py-1.5 border border-slate-200 rounded-md text-slate-300 cursor-not-allowed">
-              Previous
-            </button>
-            <button className="px-3 py-1.5 bg-[#2563EB] text-white rounded-md font-medium">
-              1
-            </button>
-            <button disabled className="px-2.5 sm:px-3 py-1.5 border border-slate-200 rounded-md text-slate-300 cursor-not-allowed">
-              Next
-            </button>
-          </div>
+          <button
+            onClick={() => alert("Exporting buyer list...")}
+            className="flex items-center space-x-1.5 px-3 py-1.5 border border-slate-200 bg-white rounded-lg text-xs sm:text-sm text-slate-700 hover:bg-slate-50 transition-colors whitespace-nowrap"
+          >
+            <Download className="w-4 h-4 text-slate-500" />
+            <span>Export</span>
+          </button>
         </div>
       </div>
 
-      {/* FLOATING ACTION MENU (FIXED OVERLAY - NO CUTOFF) */}
-      {actionMenu && (
-        <div
-          ref={menuRef}
-          className="fixed z-[100] w-36 bg-white border border-slate-200 rounded-lg shadow-xl py-1 text-left"
-          style={{
-            top: actionMenu.top,
-            left: actionMenu.left,
-          }}
-        >
-          <button
-            onClick={() => {
-              setViewBuyer(actionMenu.buyer);
-              setActionMenu(null);
-            }}
-            className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
-          >
-            View buyer
-          </button>
-          <button
-            onClick={() => {
-              setEditBuyer(actionMenu.buyer);
-              setActionMenu(null);
-            }}
-            className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
-          >
-            Edit buyer
-          </button>
-          <button
-            onClick={() => {
-              setBuyers((prev) => prev.filter((b) => b.id !== actionMenu.buyer.id));
-              setSelected((prev) => prev.filter((id) => id !== actionMenu.buyer.id));
-              setActionMenu(null);
-            }}
-            className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 transition-colors font-medium"
-          >
-            Remove
-          </button>
-        </div>
-      )}
+      {/* TABLE */}
+      <div className="bg-white border border-t-0 border-slate-200 rounded-b-xl shadow-sm overflow-hidden">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader />
+          </div>
+        ) : error ? (
+          <div className="p-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+              <p className="font-semibold">Error loading buyers</p>
+              <p className="text-sm mt-1">{error}</p>
+              <button
+                onClick={fetchBuyers}
+                className="mt-3 px-4 py-2 text-sm font-semibold bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        ) : (
+          <MaterialTable
+            config={buyersRegistryTableConfig}
+            data={filteredData}
+            getRowId={(row) => row.id}
+            enableRowSelection
+            rowSelection={rowSelection}
+            onRowSelectionChange={handleRowSelectionChange}
+            onView={(buyer) => setViewBuyer(buyer)}
+            onEdit={(buyer) => setEditBuyer(buyer)}
+          />
+        )}
+      </div>
 
       {/* VIEW BUYER INFO POPUP MODAL */}
       {viewBuyer && (
@@ -675,7 +523,7 @@ const Buyers = () => {
               </div>
               <div>
                 <p className="text-xs text-slate-400">Buyer ID</p>
-                <p className="font-mono text-slate-800 mt-0.5">{viewBuyer.id}</p>
+                <p className="font-mono text-slate-800 mt-0.5">{viewBuyer.code}</p>
               </div>
               <div>
                 <p className="text-xs text-slate-400">Type</p>
@@ -686,8 +534,24 @@ const Buyers = () => {
                 <p className="font-medium text-slate-800 mt-0.5">{viewBuyer.location}</p>
               </div>
               <div>
+                <p className="text-xs text-slate-400">GST Number</p>
+                <p className="font-medium text-slate-800 mt-0.5">{viewBuyer.gstNumber || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">Contact Person</p>
+                <p className="font-medium text-slate-800 mt-0.5">{viewBuyer.contactPerson || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">Email</p>
+                <p className="font-medium text-slate-800 mt-0.5">{viewBuyer.email || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-400">Phone</p>
+                <p className="font-medium text-slate-800 mt-0.5">{viewBuyer.phone || "—"}</p>
+              </div>
+              <div>
                 <p className="text-xs text-slate-400">Total Spend</p>
-                <p className="font-semibold text-slate-900 mt-0.5">{money(viewBuyer.spend)}</p>
+                <p className="font-semibold text-slate-900 mt-0.5">{viewBuyer.spendDisplay}</p>
               </div>
               <div>
                 <p className="text-xs text-slate-400">Date Joined</p>
@@ -801,7 +665,7 @@ const Buyers = () => {
         </div>
       )}
 
-      {/* INVITE BUYER MODAL (WITH EMAIL ID) */}
+      {/* INVITE BUYER MODAL */}
       {showInviteModal && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-[110] p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-slate-200">
@@ -825,7 +689,6 @@ const Buyers = () => {
                 />
               </div>
 
-              {/* Added Email ID Field */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Email ID</label>
                 <input

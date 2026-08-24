@@ -131,6 +131,67 @@ export const sidebarMenus = {
       icon: Package,
       path: RoutePath.DEALER_MARKETPLACE,
     },
+
+    {
+      label: "Quotations",
+      icon: Package,
+      path: RoutePath.DEALER_QUOTATIONS,
+    },
+
+    {
+      label: "Live Auctions",
+      icon: Package,
+      path: RoutePath.DEALER_LIVE_AUCTIONS,
+    },
+
+     {
+      label: "Bids",
+      icon: Package,
+      path: RoutePath.DEALER_MY_BIDS,
+    },
+
+     {
+      label: "Won Auctions",
+      icon: Package,
+      path: RoutePath.DEALER_WON_AUCTIONS,
+    },
+
+     {
+      label: "Purchased Scrap",
+      icon: Package,
+      path: RoutePath.DEALER_PURCHASED_SCRAP,
+    },
+
+     {
+      label: "Scrap Inventory",
+      icon: Package,
+      path: RoutePath.DEALER_SCRAP_INVENTORY,
+    },
+
+     {
+      label: "Orders",
+      icon: Package,
+      path: RoutePath.DEALER_ORDERS,
+    },
+
+     {
+      label: "Reports",
+      icon: Package,
+      path: RoutePath.DEALER_REPORTS,
+    },
+
+     {
+      label: "Notifications",
+      icon: Package,
+      path: RoutePath.DEALER_NOTIFICATIONS,
+    },
+
+     {
+      label: "Settings",
+      icon: Package,
+      path: RoutePath.DEALER_SETTINGS,
+    },
+
   ],
 
   [USER_ROLES.BUYER]: [

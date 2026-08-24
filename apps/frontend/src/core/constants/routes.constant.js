@@ -94,11 +94,25 @@ class RoutePath {
 
   static DEALER_MARKETPLACE = `${this.DEALER_BASE}/marketplace`;
 
-  static DEALER_AUCTIONS = `${this.DEALER_BASE}/auctions`;
+  static DEALER_LIVE_AUCTIONS = `${this.DEALER_BASE}/auctions`;
+
+  static DEALER_QUOTATIONS = `${this.DEALER_BASE}/quotationsS`;
 
   static DEALER_MY_BIDS = `${this.DEALER_BASE}/bids`;
 
+  static DEALER_WON_AUCTIONS = `${this.DEALER_BASE}/won-auctions`;
+
+  static DEALER_PURCHASED_SCRAP = `${this.DEALER_BASE}/purchased-scrap`;
+
+  static DEALER_SCRAP_INVENTORY = `${this.DEALER_BASE}/scrap-inventory`;
+
   static DEALER_ORDERS = `${this.DEALER_BASE}/orders`;
+
+  static DEALER_REPORTS = `${this.DEALER_BASE}/reports`;
+
+  static DEALER_NOTIFICATIONS = `${this.DEALER_BASE}/notifications`;
+
+  static DEALER_SETTINGS = `${this.DEALER_BASE}/settings`;
 
   static DEALER_TRANSPORT = `${this.DEALER_BASE}/transport`;
 
