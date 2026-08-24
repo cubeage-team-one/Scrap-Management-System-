@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Search,
@@ -14,121 +14,8 @@ import {
 
 import MaterialTable from "../../components/common/MaterialTable";
 import { adminTableConfig } from "../../configs/tables/adminTable.config";
-
-const INITIAL_INDUSTRIES = [
-  {
-    id: "1",
-    initials: "TA",
-    companyName: "Tata Precision Forgings",
-    code: "IND-1042",
-    sector: "Automobile",
-    location: "Pune, MH",
-    tradedValue: 19400000,
-    tradedValueDisplay: "₹1,94,00,000",
-    status: "Approved",
-    date: "28 Jul 2026",
-    contactPerson: "Rajesh Sharma",
-    email: "procurement@tataprecision.com",
-    phone: "+91 98230 12345",
-    gstNumber: "27AAACT2727Q1ZB",
-  },
-  {
-    id: "2",
-    initials: "BH",
-    companyName: "Bharat Steel Works",
-    code: "IND-1041",
-    sector: "Steel Plant",
-    location: "Jamshedpur, JH",
-    tradedValue: 42800000,
-    tradedValueDisplay: "₹4,28,00,000",
-    status: "Approved",
-    date: "27 Jul 2026",
-    contactPerson: "Alok Mukherjee",
-    email: "scrap.sales@bharatsteel.com",
-    phone: "+91 94311 88900",
-    gstNumber: "20AABCB4411K1Z2",
-  },
-  {
-    id: "3",
-    initials: "NE",
-    companyName: "Nexa Electronics",
-    code: "IND-1040",
-    sector: "Electronics",
-    location: "Bengaluru, KA",
-    tradedValue: 8600000,
-    tradedValueDisplay: "₹86,00,000",
-    status: "Approved",
-    date: "27 Jul 2026",
-    contactPerson: "Priya Sundaram",
-    email: "e-waste@nexaelectronics.io",
-    phone: "+91 98450 67123",
-    gstNumber: "29AAGCN9921D1ZZ",
-  },
-  {
-    id: "4",
-    initials: "SU",
-    companyName: "Surat Polymers Ltd.",
-    code: "IND-1039",
-    sector: "Plastics",
-    location: "Surat, GJ",
-    tradedValue: 5400000,
-    tradedValueDisplay: "₹54,00,000",
-    status: "Pending",
-    date: "26 Jul 2026",
-    contactPerson: "Kishore Patel",
-    email: "recycling@suratpolymers.in",
-    phone: "+91 98251 44321",
-    gstNumber: "24AACCS3322E1ZW",
-  },
-  {
-    id: "5",
-    initials: "TI",
-    companyName: "Tiruppur Knitwear",
-    code: "IND-1038",
-    sector: "Textile",
-    location: "Tiruppur, TN",
-    tradedValue: 2100000,
-    tradedValueDisplay: "₹21,00,000",
-    status: "Rejected",
-    date: "25 Jul 2026",
-    contactPerson: "M. Saravanan",
-    email: "waste@tiruppurknitwear.org",
-    phone: "+91 94432 99881",
-    gstNumber: "33AAACT1190L1ZO",
-  },
-  {
-    id: "6",
-    initials: "AS",
-    companyName: "Ashok Auto Components",
-    code: "IND-1037",
-    sector: "Automobile",
-    location: "Chennai, TN",
-    tradedValue: 15200000,
-    tradedValueDisplay: "₹1,52,00,000",
-    status: "Approved",
-    date: "24 Jul 2026",
-    contactPerson: "V. Raghavan",
-    email: "admin@ashokautocomp.com",
-    phone: "+91 98840 55214",
-    gstNumber: "33AABCA8844H1ZX",
-  },
-  {
-    id: "7",
-    initials: "MA",
-    companyName: "Mahindra Heavy Engineering",
-    code: "IND-1036",
-    sector: "Manufacturing",
-    location: "Nashik, MH",
-    tradedValue: 31500000,
-    tradedValueDisplay: "₹3,15,00,000",
-    status: "Approved",
-    date: "23 Jul 2026",
-    contactPerson: "Sanjay Deshmukh",
-    email: "disposal@mahindraheavy.com",
-    phone: "+91 98220 77112",
-    gstNumber: "27AAACM1234F1ZA",
-  },
-];
+import ApiService from "../../core/services/api.service";
+import Loader from "../../components/common/Loader";
 
 const SECTORS = [
   "All Sectors",
@@ -143,11 +30,15 @@ const SECTORS = [
 const STATUS_LIST = ["All statuses", "Approved", "Pending", "Rejected"];
 
 export default function Industries() {
-  const [industries, setIndustries] = useState(INITIAL_INDUSTRIES);
+  const [industries, setIndustries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("All statuses");
   const [selectedSector, setSelectedSector] = useState("All Sectors");
   const [selectedRows, setSelectedRows] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   // Dropdown states
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
@@ -171,6 +62,76 @@ export default function Industries() {
     phone: "",
     gstNumber: "",
   });
+
+  // Fetch industries data from API
+  useEffect(() => {
+    fetchIndustries();
+  }, [page, selectedStatus, searchQuery]);
+
+  const fetchIndustries = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const statusParam = selectedStatus !== "All statuses" 
+        ? selectedStatus.toUpperCase() === "APPROVED" ? "ACTIVE" 
+        : selectedStatus.toUpperCase() === "PENDING" ? "PENDING"
+        : selectedStatus.toUpperCase() === "REJECTED" ? "REJECTED"
+        : null
+        : null;
+
+      const response = await ApiService.get("/admin/industries", {
+        status: statusParam,
+        search: searchQuery || undefined,
+        page,
+        limit: 10,
+      });
+
+      if (response.data?.success) {
+        // Map backend response to frontend format
+        const mappedIndustries = response.data.data.map((org) => {
+          const words = org.companyName.trim().split(" ");
+          const initials =
+            words.length > 1
+              ? (words[0][0] + words[1][0]).toUpperCase()
+              : words[0].slice(0, 2).toUpperCase();
+
+          return {
+            id: org.id,
+            initials,
+            companyName: org.companyName,
+            code: org.code,
+            sector: org.sector,
+            location: org.location,
+            tradedValue: org.tradedValue || 0,
+            tradedValueDisplay: org.tradedValueDisplay || "₹0",
+            status: org.status === "ACTIVE" ? "Approved" : org.status === "PENDING" ? "Pending" : "Rejected",
+            date: new Date(org.createdAt).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            }),
+            contactPerson: org.contactPerson,
+            email: org.contactEmail,
+            phone: org.contactPhone,
+            gstNumber: org.gstNumber,
+            createdAt: org.createdAt,
+            address: org.address,
+          };
+        });
+
+        setIndustries(mappedIndustries);
+        setTotalRecords(response.data.total);
+      }
+    } catch (err) {
+      console.error("Failed to fetch industries:", err);
+      setError(err.response?.data?.message || "Failed to fetch industries");
+      // Fallback to initial data if API fails
+      setIndustries(INITIAL_INDUSTRIES);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filter Logic
   const filteredIndustries = useMemo(() => {
@@ -300,54 +261,60 @@ export default function Industries() {
   };
 
   // Form submission: Onboard / Add
-  const handleAddIndustry = (e) => {
+  const handleAddIndustry = async (e) => {
     e.preventDefault();
     if (!formData.companyName || !formData.location) return;
 
-    const words = formData.companyName.trim().split(" ");
-    const initials =
-      words.length > 1
-        ? (words[0][0] + words[1][0]).toUpperCase()
-        : words[0].slice(0, 2).toUpperCase();
+    try {
+      // Call API to create industry (would need an onboard endpoint)
+      // For now, just add to local state and show success
+      const words = formData.companyName.trim().split(" ");
+      const initials =
+        words.length > 1
+          ? (words[0][0] + words[1][0]).toUpperCase()
+          : words[0].slice(0, 2).toUpperCase();
 
-    const rawVal = parseFloat(formData.tradedValue) || 0;
-    const formattedVal = "₹" + rawVal.toLocaleString("en-IN");
-    const nextCode = "IND-" + (1043 + industries.length);
+      const rawVal = parseFloat(formData.tradedValue) || 0;
+      const formattedVal = "₹" + rawVal.toLocaleString("en-IN");
 
-    const newIndustry = {
-      id: String(Date.now()),
-      initials,
-      companyName: formData.companyName,
-      code: nextCode,
-      sector: formData.sector,
-      location: formData.location,
-      tradedValue: rawVal,
-      tradedValueDisplay: formattedVal,
-      status: formData.status,
-      date: new Date().toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }),
-      contactPerson: formData.contactPerson,
-      email: formData.email,
-      phone: formData.phone,
-      gstNumber: formData.gstNumber,
-    };
+      const newIndustry = {
+        id: String(Date.now()),
+        initials,
+        companyName: formData.companyName,
+        code: "IND-" + (1043 + industries.length),
+        sector: formData.sector,
+        location: formData.location,
+        tradedValue: rawVal,
+        tradedValueDisplay: formattedVal,
+        status: formData.status,
+        date: new Date().toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+        contactPerson: formData.contactPerson,
+        email: formData.email,
+        phone: formData.phone,
+        gstNumber: formData.gstNumber,
+      };
 
-    setIndustries([newIndustry, ...industries]);
-    setIsOnboardModalOpen(false);
-    setFormData({
-      companyName: "",
-      sector: "Automobile",
-      location: "",
-      tradedValue: "",
-      status: "Approved",
-      contactPerson: "",
-      email: "",
-      phone: "",
-      gstNumber: "",
-    });
+      setIndustries([newIndustry, ...industries]);
+      setIsOnboardModalOpen(false);
+      setFormData({
+        companyName: "",
+        sector: "Automobile",
+        location: "",
+        tradedValue: "",
+        status: "Approved",
+        contactPerson: "",
+        email: "",
+        phone: "",
+        gstNumber: "",
+      });
+    } catch (err) {
+      console.error("Failed to add industry:", err);
+      setError("Failed to onboard industry");
+    }
   };
 
   // Form submission: Edit
@@ -536,34 +503,52 @@ export default function Industries() {
         </div>
 
         {/* ================= INDUSTRIES TABLE ================= */}
-        <MaterialTable
-          config={adminTableConfig}
-          data={filteredIndustries}
-          getRowId={(row) => row.id}
-          onView={(industry) => {
-            setActiveIndustry(industry);
-            setIsViewModalOpen(true);
-          }}
-          onEdit={(industry) => {
-            setActiveIndustry(industry);
-            setFormData({
-              companyName: industry.companyName,
-              sector: industry.sector,
-              location: industry.location,
-              tradedValue: industry.tradedValue,
-              status: industry.status,
-              contactPerson: industry.contactPerson || "",
-              email: industry.email || "",
-              phone: industry.phone || "",
-              gstNumber: industry.gstNumber || "",
-            });
-            setIsEditModalOpen(true);
-          }}
-          onDelete={handleDeleteIndustry}
-          enableRowSelection
-          rowSelection={rowSelection}
-          onRowSelectionChange={handleRowSelectionChange}
-        />
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader />
+          </div>
+        ) : error ? (
+          <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-destructive">
+            <p className="font-semibold">Error loading industries</p>
+            <p className="text-sm mt-1">{error}</p>
+            <button
+              type="button"
+              onClick={fetchIndustries}
+              className="mt-3 px-4 py-2 text-sm font-semibold bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : (
+          <MaterialTable
+            config={adminTableConfig}
+            data={filteredIndustries}
+            getRowId={(row) => row.id}
+            onView={(industry) => {
+              setActiveIndustry(industry);
+              setIsViewModalOpen(true);
+            }}
+            onEdit={(industry) => {
+              setActiveIndustry(industry);
+              setFormData({
+                companyName: industry.companyName,
+                sector: industry.sector,
+                location: industry.location,
+                tradedValue: industry.tradedValue,
+                status: industry.status,
+                contactPerson: industry.contactPerson || "",
+                email: industry.email || "",
+                phone: industry.phone || "",
+                gstNumber: industry.gstNumber || "",
+              });
+              setIsEditModalOpen(true);
+            }}
+            onDelete={handleDeleteIndustry}
+            enableRowSelection
+            rowSelection={rowSelection}
+            onRowSelectionChange={handleRowSelectionChange}
+          />
+        )}
       </div>
 
       {/* ================= FILTER DRAWER / MODAL ================= */}

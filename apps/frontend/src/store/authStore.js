@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import {
+  getStoredUser,
   setStoredUser,
   setToken,
   clearSession,
@@ -49,8 +50,7 @@ const MOCK_USERS = {
 };
 
 export const useAuthStore = create((set) => ({
-  // Temporary: change the role here to test different dashboards
-  user: MOCK_USERS.INDUSTRY,
+  user: getStoredUser(),
 
   login: ({ user, token }) => {
     setToken(token);

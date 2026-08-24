@@ -142,6 +142,8 @@ model Organisation {
   contactPhone  String
 
   accountState  AccountState   @default(PENDING)
+  rejectReason  String?
+  approvedAt    DateTime?
 
   approvedByUserId String?
   approvedBy       User?       @relation("OrganisationApprovedBy", fields: [approvedByUserId], references: [id])

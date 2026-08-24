@@ -42,6 +42,15 @@ import IndustryMarketplace from "../pages/industry/IndustryMarketplace";
 // Dealer
 import DealerDashboard from "../pages/dealer/DealerDashboard";
 import DealerProfile from "../pages/dealer/Profile";
+import PurchasedScrap from "../pages/dealer/PurchasedScrap";
+import ScrapInventory from "../pages/dealer/ScrapInventory";
+import LiveAuctions from "../pages/dealer/LiveAuction";
+import MyBids from "../pages/dealer/MyBids";
+import WonAuctions from "../pages/dealer/WonAuction";
+import Orders from "../pages/dealer/Orders";
+import DealerReports from "../pages/dealer/DealerReports";
+import DealerQuotation from "../pages/dealer/DealerQuotation";
+import Notification from "../pages/dealer/Notification";
 
 // Buyer
 import BuyerDashboard from "../pages/buyer/BuyerDashboard";
@@ -187,6 +196,51 @@ const AppRoutes = () => {
           <Route
             path={RoutePath.DEALER_PROFILE}
             element={<DealerProfile />}
+          />
+
+           <Route
+            path={RoutePath.DEALER_PURCHASED_SCRAP}
+            element={<PurchasedScrap />}
+          />
+
+           <Route
+            path={RoutePath.DEALER_SCRAP_INVENTORY}
+            element={<ScrapInventory />}
+          />
+
+           <Route
+            path={RoutePath.DEALER_LIVE_AUCTIONS}
+            element={<LiveAuctions />}
+          />
+
+           <Route
+            path={RoutePath.DEALER_MY_BIDS}
+            element={<MyBids />} 
+          />
+
+           <Route
+            path={RoutePath.DEALER_WON_AUCTIONS}
+            element={<WonAuctions />}
+          />
+
+           <Route
+            path={RoutePath.DEALER_ORDERS}
+            element={<Orders />}
+          />
+
+           <Route
+            path={RoutePath.DEALER_REPORTS}
+            element={<DealerReports />}
+          />
+
+             <Route
+            path={RoutePath.DEALER_QUOTATIONS}
+            element={<DealerQuotation />}
+          />
+
+            <Route
+            path={RoutePath.DEALER_NOTIFICATIONS}
+            element={<Notification/>}
           />
         </Route>
 
