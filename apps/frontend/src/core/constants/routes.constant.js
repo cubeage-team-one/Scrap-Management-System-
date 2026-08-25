@@ -96,7 +96,7 @@ class RoutePath {
 
   static DEALER_LIVE_AUCTIONS = `${this.DEALER_BASE}/auctions`;
 
-  static DEALER_QUOTATIONS = `${this.DEALER_BASE}/quotationsS`;
+  static DEALER_QUOTATIONS = `${this.DEALER_BASE}/quotations`;
 
   static DEALER_MY_BIDS = `${this.DEALER_BASE}/bids`;
 
