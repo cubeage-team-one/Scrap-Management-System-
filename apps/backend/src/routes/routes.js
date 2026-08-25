@@ -3,6 +3,7 @@ import authRoutes from '../modules/auth/auth.routes.js';
 import adminRoutes from '../modules/admin/admin.routes.js';
 import listingRoutes from '../modules/marketplace/listings/listing.routes.js';
 import quotationRoutes from '../modules/marketplace/quotation/quotation.routes.js';
+import auctionRoutes from '../modules/marketplace/auction/auction.routes.js';
 import scrapRoutes from '../modules/scrap/scrap.routes.js';
 import categoryRoutes from '../modules/category/category.routes.js';
 
@@ -13,6 +14,7 @@ router.use('/auth', authRoutes);
 router.use('/admin', adminRoutes);
 router.use('/marketplace/listings', listingRoutes);
 router.use('/marketplace/quotations', quotationRoutes);
+router.use('/marketplace/auctions', auctionRoutes);
 router.use('/scrap', scrapRoutes);
 router.use('/category', categoryRoutes);
 

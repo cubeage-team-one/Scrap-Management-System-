@@ -38,6 +38,7 @@ import MyListings from "../pages/industry/MyListings";
 import IndustrySettings from "../pages/industry/Settings";
 import IndustryAuctions from "../pages/industry/IndustryAuctions";
 import IndustryMarketplace from "../pages/industry/IndustryMarketplace";
+import IndustryNotification from "../pages/industry/Notification";
 // import IndustryReports from "../pages/industry/Reports";
 
 // Dealer
@@ -180,6 +181,11 @@ const AppRoutes = () => {
           <Route
             path={RoutePath.INDUSTRY_DEALER_MARKETPLACE}
             element={<IndustryMarketplace />}
+          />
+
+          <Route
+            path={RoutePath.INDUSTRY_NOTIFICATIONS}
+            element={<IndustryNotification />}
           />
 
 
