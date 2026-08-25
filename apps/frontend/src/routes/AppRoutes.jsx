@@ -34,6 +34,7 @@ import Settings from "../pages/superAdmin/Settings";
 import IndustryDashboard from "../pages/industry/IndustryDashboard";
 import MyScrap from "../pages/industry/MyScrap";
 import IndustryInventory from "../pages/industry/IndustryInventory";
+import MyListings from "../pages/industry/MyListings";
 import IndustrySettings from "../pages/industry/Settings";
 import IndustryAuctions from "../pages/industry/IndustryAuctions";
 import IndustryMarketplace from "../pages/industry/IndustryMarketplace";
@@ -159,6 +160,11 @@ const AppRoutes = () => {
           <Route
             path={RoutePath.INDUSTRY_INVENTORY}
             element={<IndustryInventory />}
+          />
+
+          <Route
+            path={RoutePath.INDUSTRY_LISTINGS}
+            element={<MyListings />}
           />
 
           <Route

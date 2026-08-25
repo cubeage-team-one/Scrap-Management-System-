@@ -80,6 +80,11 @@ export const sidebarMenus = {
       path: RoutePath.INDUSTRY_INVENTORY,
     },
     {
+      label: "My Listings",
+      icon: Package,
+      path: RoutePath.INDUSTRY_LISTINGS,
+    },
+    {
       label: "Marketplace",
       icon: Package,
       path: RoutePath.INDUSTRY_DEALER_MARKETPLACE,
@@ -89,12 +94,6 @@ export const sidebarMenus = {
       icon: Package,
       path: RoutePath.INDUSTRY_AUCTIONS,
     },
-    {
-      label: "Quotations",
-      icon: Package,
-      path: RoutePath.INDUSTRY_QUOTATIONS,
-    },
-
     {
       label: "Sales Orders",
       icon: Package,

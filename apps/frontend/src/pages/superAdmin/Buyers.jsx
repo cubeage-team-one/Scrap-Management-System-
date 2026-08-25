@@ -174,7 +174,7 @@ const Buyers = () => {
   const handleApproveSelected = async () => {
     try {
       await Promise.all(
-        selected.map((id) => ApiService.updateBuyerStatus(id, { accountState: "ACTIVE" }))
+        selected.map((id) => updateBuyerStatus(id, { accountState: "ACTIVE" }))
       );
       setSelected([]);
       fetchBuyers();
@@ -187,7 +187,7 @@ const Buyers = () => {
   const handleRejectSelected = async () => {
     try {
       await Promise.all(
-        selected.map((id) => ApiService.updateBuyerStatus(id, { accountState: "REJECTED" }))
+        selected.map((id) => updateBuyerStatus(id, { accountState: "REJECTED" }))
       );
       setSelected([]);
       fetchBuyers();

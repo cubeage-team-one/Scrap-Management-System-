@@ -87,7 +87,7 @@ class ServerUrl {
   // LISTING
   // =========================================================
 
-  static API_MODULE_LISTING = "listing";
+  static API_MODULE_LISTING = "marketplace/listings";
 
   static API_GET_LISTINGS =
     `${ServerUrl.API_MODULE_LISTING}`;
@@ -101,6 +101,9 @@ class ServerUrl {
   static API_UPDATE_LISTING = (id) =>
     `${ServerUrl.API_MODULE_LISTING}/${id}`;
 
+  static API_PUBLISH_LISTING = (id) =>
+    `${ServerUrl.API_MODULE_LISTING}/${id}/publish`;
+
   static API_DELETE_LISTING = (id) =>
     `${ServerUrl.API_MODULE_LISTING}/${id}`;
 
@@ -108,7 +111,7 @@ class ServerUrl {
   // QUOTATION
   // =========================================================
 
-  static API_MODULE_QUOTATION = "quotation";
+  static API_MODULE_QUOTATION = "marketplace/quotations";
 
   static API_GET_QUOTATIONS =
     `${ServerUrl.API_MODULE_QUOTATION}`;
@@ -118,6 +121,15 @@ class ServerUrl {
 
   static API_CREATE_QUOTATION =
     `${ServerUrl.API_MODULE_QUOTATION}`;
+
+  static API_ACCEPT_QUOTATION = (id) =>
+    `${ServerUrl.API_MODULE_QUOTATION}/${id}/accept`;
+
+  static API_REJECT_QUOTATION = (id) =>
+    `${ServerUrl.API_MODULE_QUOTATION}/${id}/reject`;
+
+  static API_WITHDRAW_QUOTATION = (id) =>
+    `${ServerUrl.API_MODULE_QUOTATION}/${id}/withdraw`;
 
   // =========================================================
   // AUCTION

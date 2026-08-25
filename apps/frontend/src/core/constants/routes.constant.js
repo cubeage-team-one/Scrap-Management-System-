@@ -60,6 +60,8 @@ class RoutePath {
 
   static INDUSTRY_INVENTORY = `${this.INDUSTRY_BASE}/inventory`;
 
+  static INDUSTRY_LISTINGS = `${this.INDUSTRY_BASE}/listings`;
+
   static INDUSTRY_DEALER_MARKETPLACE = `${this.INDUSTRY_BASE}/industry-marketplace`;
 
   static INDUSTRY_ADD_SCRAP = `${this.INDUSTRY_BASE}/scrap/add`;

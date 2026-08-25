@@ -27,23 +27,29 @@ router.post(
   createListing
 );
 
-router.get("/", getListings);
+router.get("/", requireAuth, getListings);
 
-router.get("/:id", getListingById);
+router.get("/:id", requireAuth, getListingById);
 
 router.patch(
   "/:id",
+  requireAuth,
+  allowRoles("INDUSTRY", "DEALER"),
   validateUpdateListing,
   updateListing
 );
 
 router.patch(
   "/:id/publish",
+  requireAuth,
+  allowRoles("INDUSTRY", "DEALER"),
   publishListing
 );
 
 router.delete(
   "/:id",
+  requireAuth,
+  allowRoles("INDUSTRY", "DEALER"),
   cancelListing
 );
 
