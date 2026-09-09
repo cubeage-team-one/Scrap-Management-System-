@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart3,
   ChevronRight,
@@ -22,7 +22,13 @@ import {
   YAxis,
 } from "recharts";
 
-import StatusBadge from "../../components/common/StatusBadge";
+import MaterialTable from "../../components/common/MaterialTable";
+import ApiService from "../../core/services/api.service";
+import {
+  industryPerformanceColumns,
+  buyerPerformanceColumns,
+} from "../../configs/tables/buyerReportsTable.config";
+
 
 // --- Mock data ---
 // Replace with API calls once the reporting endpoints are ready.
@@ -32,8 +38,6 @@ const stats = [
   { title: "Auction Realisation", value: "112%", icon: Gavel, iconClass: "bg-success/10 text-success", change: "+4 pts", isPositive: true, note: "vs reserve" },
   { title: "Active Buyers", value: "932", icon: Users, iconClass: "bg-warning/10 text-warning", change: "+21", isPositive: true },
 ];
-
-const STATUS_VARIANTS = { Completed: "success", Pending: "warning", Rejected: "danger", Active: "info" };
 
 const lakhs = (value) => `₹${value}L`;
 const tonnes = (value) => `${value} MT`;
@@ -157,7 +161,7 @@ const TABS = {
       kind: "table",
       title: "Industry performance",
       subtitle: "Supplier scorecard by realised value and fulfilment.",
-      columns: ["Industry", "Lots", "Volume", "Realised", "Fulfilment", "Status"],
+      tableColumns: industryPerformanceColumns,
       rows: [
         { id: "Bharat Steel Works", cells: ["48", "2,140 MT", "₹9.8 Cr", "98%"], status: "Completed" },
         { id: "Tata Precision Forgings", cells: ["41", "1,860 MT", "₹8.2 Cr", "96%"], status: "Completed" },
@@ -173,7 +177,7 @@ const TABS = {
       kind: "table",
       title: "Buyer performance",
       subtitle: "Procurement scorecard by spend and settlement behaviour.",
-      columns: ["Buyer", "Orders", "Volume", "Spend", "On-time payment", "Status"],
+      tableColumns: buyerPerformanceColumns,
       rows: [
         { id: "Verma Recycling Pvt. Ltd.", cells: ["64", "2,480 MT", "₹11.2 Cr", "99%"], status: "Completed" },
         { id: "Metro Recyclers Pvt Ltd", cells: ["52", "1,930 MT", "₹8.7 Cr", "95%"], status: "Completed" },
@@ -344,48 +348,38 @@ const TablePanel = ({ spec }) => (
       <PanelHeader title={spec.title} subtitle={spec.subtitle} />
     </div>
 
-    <div className="overflow-x-auto border-t border-border">
-      <table className="w-full text-left border-collapse min-w-[720px]">
-        <thead>
-          <tr className="border-b border-border bg-muted">
-            {spec.columns.map((heading) => (
-              <th
-                key={heading}
-                className="px-4 py-3 text-xs font-bold uppercase md:px-6 text-muted-foreground"
-              >
-                {heading}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {spec.rows.map((row) => (
-            <tr key={row.id} className="border-b border-border last:border-b-0 hover:bg-muted">
-              <td className="px-4 py-3 text-sm font-semibold md:px-6 text-card-foreground">
-                {row.id}
-              </td>
-              {row.cells.map((cell, index) => (
-                <td
-                  key={`${row.id}-${index}`}
-                  className="px-4 py-3 text-sm md:px-6 text-muted-foreground"
-                >
-                  {cell}
-                </td>
-              ))}
-              <td className="px-4 py-3 md:px-6">
-                <StatusBadge label={row.status} variant={STATUS_VARIANTS[row.status]} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="border-t border-border">
+      <MaterialTable
+        columns={spec.tableColumns}
+        data={spec.rows}
+        getRowId={(row) => row.id}
+      />
     </div>
   </Panel>
 );
 
 const BuyerReports = () => {
   const [tab, setTab] = useState(TAB_NAMES[0]);
+
+  const [buyerData, setBuyerData] = useState(null);
+
+  useEffect(() => {
+    fetchBuyerReports();
+  }, []);
+
+  const fetchBuyerReports = async () => {
+    try {
+      const res = await ApiService.getBuyerReports();
+      if (res.data?.success) {
+        setBuyerData(res.data.data);
+      }
+    } catch (err) {
+      console.error("Error fetching buyer reports:", err);
+    }
+  };
+
   const { main, side } = TABS[tab];
+
 
   return (
     <section>

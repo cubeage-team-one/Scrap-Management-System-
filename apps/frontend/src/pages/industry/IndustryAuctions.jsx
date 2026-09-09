@@ -21,6 +21,8 @@ import {
 } from "recharts";
 
 import StatusBadge from "../../components/common/StatusBadge";
+import MaterialTable from "../../components/common/MaterialTable";
+import { auctionResultsColumns } from "../../configs/tables/auctionResultsTable.config";
 
 // --- Mock data ---
 // Replace with API calls once the auction endpoints are ready.
@@ -96,8 +98,6 @@ const performanceData = [
   { name: "Jun", lots: 12, realised: 74 },
   { name: "Jul", lots: 16, realised: 89 },
 ];
-
-const RESULT_VARIANTS = { Completed: "success", Pending: "warning", Rejected: "danger" };
 
 const inr = new Intl.NumberFormat("en-IN");
 const money = (value) => `₹${inr.format(value)}`;
@@ -390,46 +390,12 @@ const IndustryAuctions = () => {
             </p>
           </div>
 
-          <div className="overflow-x-auto border-t border-border">
-            <table className="w-full text-left border-collapse min-w-[760px]">
-              <thead>
-                <tr className="border-b border-border bg-muted">
-                  {["Lot", "Winner", "Reserve", "Final price", "Closed", "Status"].map((heading) => (
-                    <th
-                      key={heading}
-                      className="px-4 py-3 text-xs font-bold uppercase md:px-6 text-muted-foreground"
-                    >
-                      {heading}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((row) => (
-                  <tr key={row.id} className="border-b border-border last:border-b-0 hover:bg-muted">
-                    <td className="px-4 py-3 md:px-6">
-                      <p className="text-sm font-semibold text-card-foreground">{row.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {row.id} · {row.weight}
-                      </p>
-                    </td>
-                    <td className="px-4 py-3 text-sm md:px-6 text-card-foreground">{row.winner}</td>
-                    <td className="px-4 py-3 text-sm md:px-6 text-muted-foreground">{money(row.reserve)}</td>
-                    <td
-                      className={`px-4 py-3 md:px-6 text-sm font-semibold ${
-                        row.final >= row.reserve ? "text-success" : "text-destructive"
-                      }`}
-                    >
-                      {money(row.final)}
-                    </td>
-                    <td className="px-4 py-3 text-sm md:px-6 text-muted-foreground">{row.closed}</td>
-                    <td className="px-4 py-3 md:px-6">
-                      <StatusBadge label={row.status} variant={RESULT_VARIANTS[row.status]} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="border-t border-border">
+            <MaterialTable
+              columns={auctionResultsColumns}
+              data={results}
+              getRowId={(row) => row.id}
+            />
           </div>
         </Panel>
       )}

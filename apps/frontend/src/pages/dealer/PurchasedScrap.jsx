@@ -1,128 +1,5 @@
-import React, { useState, useMemo } from 'react'
-
-// Purchase History Data
-const INITIAL_PURCHASES = [
-  {
-    id: 'PUR-012',
-    status: 'Completed',
-    type: 'Auction',
-    paymentStatus: 'Payment: Paid',
-    title: 'MS Steel HMS 1&2',
-    weight: '45 MT',
-    rate: '₹37,800/MT',
-    seller: 'Tata Steel Ltd.',
-    location: 'Mumbai, MH',
-    category: 'Steel',
-    sellerRating: 4.8,
-    date: '2026-08-02',
-    invoice: 'INV-2026-0342',
-    totalPaid: '₹17,01,000',
-    rating: 4,
-    currentStep: 4, // 1: Ordered, 2: Payment, 3: Pickup, 4: Received
-    transporter: 'Metro Logistics',
-    vehicle: 'MH-04-AB-1234',
-    handover: 'Done',
-    notes: 'Excellent quality. Grade A material as advertised. Pickup smooth.',
-    image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=300&q=80',
-    shortCode: 'MS'
-  },
-  {
-    id: 'PUR-013',
-    status: 'Completed',
-    type: 'Quotation',
-    paymentStatus: 'Payment: Paid',
-    title: 'Copper Cable Scrap',
-    weight: '5.5 MT',
-    rate: '₹5,10,000/MT',
-    seller: 'Havells Industries',
-    location: 'Delhi, DL',
-    category: 'Copper',
-    sellerRating: 4.7,
-    date: '2026-08-01',
-    invoice: 'INV-2026-0339',
-    totalPaid: '₹28,05,000',
-    rating: 4,
-    currentStep: 4,
-    transporter: 'VR Logistics',
-    vehicle: 'DL-01-EA-5678',
-    handover: 'Done',
-    notes: 'High purity copper wire scrap. Verified purity test report attached.',
-    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=300&q=80',
-    shortCode: 'CU'
-  },
-  {
-    id: 'PUR-014',
-    status: 'Completed',
-    type: 'Tender',
-    paymentStatus: 'Payment: Paid',
-    title: 'Aluminium Die-Cast Scrap',
-    weight: '12 MT',
-    rate: '₹1,72,000/MT',
-    seller: 'Mahindra Auto',
-    location: 'Pune, MH',
-    category: 'Aluminium',
-    sellerRating: 4.9,
-    date: '2026-07-28',
-    invoice: 'INV-2026-0335',
-    totalPaid: '₹20,64,000',
-    rating: 5,
-    currentStep: 4,
-    transporter: 'Express Freight',
-    vehicle: 'MH-12-PQ-9999',
-    handover: 'Done',
-    notes: 'Clean engine blocks and die-cast parts. On-time delivery.',
-    image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=300&q=80',
-    shortCode: 'AL'
-  },
-  {
-    id: 'PUR-015',
-    status: 'Pending',
-    type: 'Auction',
-    paymentStatus: 'Payment: Pending',
-    title: 'Mixed E-Waste Batch',
-    weight: '2.8 MT',
-    rate: '₹91,000/MT',
-    seller: 'Samsung Electronics',
-    location: 'Chennai, TN',
-    category: 'Electronic Waste',
-    sellerRating: null,
-    date: '2026-08-02',
-    invoice: 'INV-2026-0344',
-    totalPaid: '₹2,54,800',
-    rating: 0,
-    currentStep: 1,
-    transporter: 'Awaited',
-    vehicle: '-',
-    handover: 'Pending',
-    notes: 'Awaiting payment and pickup scheduling.',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=300&q=80',
-    shortCode: 'EW'
-  },
-  {
-    id: 'PUR-016',
-    status: 'Cancelled',
-    type: 'Quotation',
-    paymentStatus: 'Payment: Refunded',
-    title: 'LDPE Film Scrap',
-    weight: '8 MT',
-    rate: '₹52,000/MT',
-    seller: 'Reliance Packaging',
-    location: 'Surat, GJ',
-    category: 'Plastic',
-    sellerRating: null,
-    date: '2026-07-30',
-    invoice: 'INV-2026-0341-CANCELLED',
-    totalPaid: '₹4,16,000',
-    rating: 0,
-    currentStep: 1,
-    transporter: '-',
-    vehicle: '-',
-    handover: 'N/A',
-    notes: 'Cancelled due to quality mismatch on inspection.',
-    image: 'https://images.unsplash.com/photo-1605600659873-d808a13e4d2a?auto=format&fit=crop&w=300&q=80',
-    shortCode: 'PL'
-  }
-]
+import React, { useState, useEffect, useMemo } from 'react'
+import ApiService from '../../core/services/api.service'
 
 // Custom Resilient Image Component with Styled Fallback Badge
 const ScrapImage = ({ src, alt, category, shortCode }) => {
@@ -144,7 +21,7 @@ const ScrapImage = ({ src, alt, category, shortCode }) => {
         <svg className="w-4 h-4 sm:w-5 sm:h-5 mb-0.5 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
         </svg>
-        <span className="text-[9px] sm:text-[10px] font-black tracking-wider">{shortCode}</span>
+        <span className="text-[9px] sm:text-[10px] font-black tracking-wider">{shortCode || "SC"}</span>
       </div>
     )
   }
@@ -160,10 +37,67 @@ const ScrapImage = ({ src, alt, category, shortCode }) => {
 }
 
 const PurchasedScrap = () => {
-  const [purchases] = useState(INITIAL_PURCHASES)
+  const [purchases, setPurchases] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
   const [activeFilter, setActiveFilter] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
-  const [expandedCards, setExpandedCards] = useState({ 'PUR-012': true })
+  const [expandedCards, setExpandedCards] = useState({})
+
+  useEffect(() => {
+    loadPurchases()
+  }, [])
+
+  const loadPurchases = async () => {
+    setIsLoading(true)
+    try {
+      const res = await ApiService.getQuotations()
+      if (res?.data?.success && res.data.data) {
+        const mapped = res.data.data.map((q) => {
+          const listing = q.listing || {}
+          const scrap = listing.scrapRecord || {}
+          const catName = scrap.category?.name || "Steel"
+          const totalVal = Number(q.pricePerKg || 0) * Number(q.quantityKg || 0)
+          
+          let pStatus = "Completed"
+          if (q.status === "SUBMITTED" || q.status === "PENDING") pStatus = "Pending"
+          else if (q.status === "REJECTED" || q.status === "WITHDRAWN" || q.status === "EXPIRED") pStatus = "Cancelled"
+
+          return {
+            id: q.id.slice(0, 8).toUpperCase(),
+            rawId: q.id,
+            status: pStatus,
+            type: listing.sellingMode || "Quotation",
+            paymentStatus: q.status === "ACCEPTED" ? "Payment: Paid" : "Payment: Pending",
+            title: scrap.description || catName + " Scrap",
+            weight: `${(Number(q.quantityKg || 0) / 1000).toFixed(1)} MT`,
+            rate: `₹${Number(q.pricePerKg || 0).toLocaleString("en-IN")}/kg`,
+            seller: scrap.owner?.companyName || "Industry Supplier",
+            location: scrap.locationLabel || "Industrial Area",
+            category: catName,
+            sellerRating: 4.8,
+            date: new Date(q.createdAt).toISOString().slice(0, 10),
+            invoice: `INV-${q.id.slice(0, 6).toUpperCase()}`,
+            totalPaid: `₹${totalVal.toLocaleString("en-IN")}`,
+            totalValNum: totalVal,
+            weightNumMT: Number(q.quantityKg || 0) / 1000,
+            rating: 5,
+            currentStep: q.status === "ACCEPTED" ? 4 : 1,
+            transporter: "Express Logistics",
+            vehicle: "MH-12-AB-1234",
+            handover: q.status === "ACCEPTED" ? "Done" : "Pending",
+            notes: q.note || "Order placed via SmartScrap platform.",
+            image: (scrap.images && scrap.images[0]) ? scrap.images[0].url : "",
+            shortCode: catName.slice(0, 2).toUpperCase()
+          }
+        })
+        setPurchases(mapped)
+      }
+    } catch (err) {
+      console.error("Error loading purchases:", err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const toggleDetails = (id) => {
     setExpandedCards((prev) => ({
@@ -176,8 +110,12 @@ const PurchasedScrap = () => {
   const completedCount = purchases.filter((p) => p.status === 'Completed').length
   const pendingCount = purchases.filter((p) => p.status === 'Pending').length
   const cancelledCount = purchases.filter((p) => p.status === 'Cancelled').length
-  const totalSpentFormatted = '₹65,70,000'
-  const totalVolumeFormatted = '62.5 MT'
+  
+  const totalSpentVal = purchases.reduce((sum, p) => sum + (p.totalValNum || 0), 0)
+  const totalVolumeVal = purchases.reduce((sum, p) => sum + (p.weightNumMT || 0), 0)
+  const totalSpentFormatted = `₹${totalSpentVal.toLocaleString('en-IN')}`
+  const totalVolumeFormatted = `${totalVolumeVal.toFixed(1)} MT`
+
 
   const filteredPurchases = useMemo(() => {
     return purchases.filter((item) => {

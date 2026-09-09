@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Bell,
   CalendarDays,
@@ -9,6 +10,11 @@ import {
   Settings,
   TrendingUp,
 } from "lucide-react";
+
+import MaterialTable from "../../components/common/MaterialTable";
+import ApiService from "../../core/services/api.service";
+import { dealerCategoryPerformanceColumns } from "../../configs/tables/dealerCategoryPerformanceTable.config";
+
 
 const reportTypes = [
   {
@@ -93,10 +99,33 @@ const revenueData = [
 ];
 
 const DealerReports = () => {
+  const [reportData, setReportData] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDealerReports();
+  }, []);
+
+  const fetchDealerReports = async () => {
+    try {
+      setLoading(true);
+      const res = await ApiService.getDealerReports();
+      if (res.data?.success) {
+        setReportData(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error loading dealer reports:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#faf9f7] text-slate-800">
       {/* HEADER */}
       <header className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6 lg:px-8">
+
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">
@@ -407,71 +436,11 @@ const DealerReports = () => {
             </button>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-[950px] w-full text-sm">
-              <thead className="bg-[#faf7f3]">
-                <tr className="text-left text-xs uppercase text-slate-500">
-                  <th className="px-5 py-3">Category</th>
-                  <th className="px-5 py-3">Total Listed</th>
-                  <th className="px-5 py-3">Total Sold</th>
-                  <th className="px-5 py-3">Avg. Price/MT</th>
-                  <th className="px-5 py-3">Revenue</th>
-                  <th className="px-5 py-3">Commission</th>
-                  <th className="px-5 py-3">Sell-through Rate</th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-slate-100">
-                {categories.map((item) => (
-                  <tr
-                    key={item.category}
-                    className="hover:bg-slate-50"
-                  >
-                    <td className="px-5 py-4 font-semibold text-slate-800">
-                      {item.category}
-                    </td>
-
-                    <td className="px-5 py-4 text-slate-600">
-                      {item.listed}
-                    </td>
-
-                    <td className="px-5 py-4 text-slate-600">
-                      {item.sold}
-                    </td>
-
-                    <td className="px-5 py-4 text-slate-600">
-                      {item.price}
-                    </td>
-
-                    <td className="px-5 py-4 font-semibold text-slate-800">
-                      {item.revenue}
-                    </td>
-
-                    <td className="px-5 py-4 text-slate-600">
-                      {item.commission}
-                    </td>
-
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-2 w-20 overflow-hidden rounded-full bg-slate-200">
-                          <div
-                            className="h-full rounded-full bg-blue-500"
-                            style={{
-                              width: `${item.rate}%`,
-                            }}
-                          />
-                        </div>
-
-                        <span className="text-xs text-slate-500">
-                          {item.rate}%
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <MaterialTable
+            columns={dealerCategoryPerformanceColumns}
+            data={categories}
+            getRowId={(row) => row.category}
+          />
         </div>
       </main>
     </div>

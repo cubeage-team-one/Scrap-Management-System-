@@ -32,12 +32,24 @@ export const createScrap = async (data, userId, organisationId) => {
   });
 };
 
-export const getScraps = async (organisationId) => {
-  return await prisma.scrapRecord.findMany({
+export const getScraps = async (organisationId, options = {}) => {
+  const { page, limit } = options;
+  const query = {
     where: { ownerId: organisationId },
-    include: { category: true } // Include category details if available
-  });
+    include: { category: true, images: true },
+    orderBy: { createdAt: 'desc' },
+  };
+
+  if (page && limit) {
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 20;
+    query.skip = (pageNum - 1) * limitNum;
+    query.take = limitNum;
+  }
+
+  return await prisma.scrapRecord.findMany(query);
 };
+
 
 export const getScrapById = async (id, organisationId) => {
   return await prisma.scrapRecord.findFirst({
@@ -94,3 +106,58 @@ export const deleteScrap = async (id, organisationId) => {
     throw notFoundError();
   }
 };
+
+export const convertSaleToInventory = async (saleId, organisationId, userId) => {
+  const sale = await prisma.sale.findUnique({
+    where: { id: saleId },
+    include: {
+      listing: {
+        include: {
+          scrapRecord: true
+        }
+      }
+    }
+  });
+
+  if (!sale) {
+    const err = new Error('Sale record not found');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  if (sale.buyerId !== organisationId) {
+    const err = new Error('Unauthorized to convert this sale to inventory');
+    err.statusCode = 403;
+    throw err;
+  }
+
+  const existingInventory = await prisma.scrapRecord.findUnique({
+    where: { sourceSaleId: saleId }
+  });
+
+  if (existingInventory) {
+    return existingInventory;
+  }
+
+  const categoryId = sale.listing.scrapRecord.categoryId;
+  const description = `Purchased via Sale #${sale.id.slice(0, 8)} - ${sale.listing.scrapRecord.description || 'Scrap Material'}`;
+  const condition = sale.listing.scrapRecord.condition || 'USED';
+
+  return await prisma.scrapRecord.create({
+    data: {
+      ownerId: organisationId,
+      categoryId: categoryId,
+      description: description,
+      condition: condition,
+      totalQuantityKg: sale.quantityKg,
+      availableQuantityKg: sale.quantityKg,
+      listedQuantityKg: 0,
+      soldQuantityKg: 0,
+      status: 'AVAILABLE',
+      sourceSaleId: saleId,
+      createdByUserId: userId
+    },
+    include: { category: true }
+  });
+};
+

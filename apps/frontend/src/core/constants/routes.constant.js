@@ -130,6 +130,8 @@ class RoutePath {
 
   static BUYER_MARKETPLACE = `${this.BUYER_BASE}/marketplace`;
 
+  static BUYER_QUOTATIONS = `${this.BUYER_BASE}/quotations`;
+
   static BUYER_AUCTIONS = `${this.BUYER_BASE}/auctions`;
 
   static BUYER_PURCHASES = `${this.BUYER_BASE}/purchases`;

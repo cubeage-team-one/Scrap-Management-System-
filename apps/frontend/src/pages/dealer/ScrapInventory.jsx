@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   Search,
   Plus,
@@ -25,148 +25,12 @@ import {
 } from "lucide-react";
 
 import MaterialTable from "../../components/common/MaterialTable";
+import AddScrapModal from "../../components/common/AddScrapModal";
+import ApiService from "../../core/services/api.service";
+
 import { dealerTableConfig } from "../../configs/tables/dealerTable.config";
 import { myScrapTableConfig } from "../../configs/tables/myScrapTable.config";
 
-// Mock initial data matching dealer inventory items
-const INITIAL_SCRAP_DATA = [
-  {
-    id: "INV-001",
-    material: "MS Steel Scrap (Heavy Melting)",
-    category: "Steel",
-    weightKg: "24,500 kg",
-    weightRawKg: 24500,
-    qtyUnit: "24.5 MT",
-    qtyRawMT: 24.5,
-    condition: "Grade A",
-    location: "Warehouse A - Bay 3",
-    expPriceMT: "₹38,500",
-    expPriceRaw: 38500,
-    totalValue: 943250,
-    status: "Available",
-    imageUrl: "https://images.unsplash.com/photo-1535813547-99c456a41d4a?w=150&auto=format&fit=crop&q=80",
-    dateAdded: "Aug 10, 2026"
-  },
-  {
-    id: "INV-002",
-    material: "Copper Wire Scrap",
-    category: "Copper",
-    weightKg: "3,200 kg",
-    weightRawKg: 3200,
-    qtyUnit: "3.2 MT",
-    qtyRawMT: 3.2,
-    condition: "Grade B",
-    location: "Warehouse B - Bay 1",
-    expPriceMT: "₹5,20,000",
-    expPriceRaw: 520000,
-    totalValue: 1664000,
-    status: "Partially Listed",
-    imageUrl: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=150&auto=format&fit=crop&q=80",
-    dateAdded: "Aug 11, 2026"
-  },
-  {
-    id: "INV-003",
-    material: "Aluminium Extrusion Scrap",
-    category: "Aluminium",
-    weightKg: "8,750 kg",
-    weightRawKg: 8750,
-    qtyUnit: "8.75 MT",
-    qtyRawMT: 8.75,
-    condition: "Grade A",
-    location: "Warehouse A - Bay 7",
-    expPriceMT: "₹1,85,000",
-    expPriceRaw: 185000,
-    totalValue: 1618750,
-    status: "Available",
-    imageUrl: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=150&auto=format&fit=crop&q=80",
-    dateAdded: "Aug 12, 2026"
-  },
-  {
-    id: "INV-004",
-    material: "HDPE Plastic Regrind",
-    category: "Plastic",
-    weightKg: "5,600 kg",
-    weightRawKg: 5600,
-    qtyUnit: "5.6 MT",
-    qtyRawMT: 5.6,
-    condition: "Grade B",
-    location: "Warehouse C - Bay 2",
-    expPriceMT: "₹62,000",
-    expPriceRaw: 62000,
-    totalValue: 347200,
-    status: "Fully Listed",
-    imageUrl: "https://images.unsplash.com/photo-1526951521990-620dc14c214b?w=150&auto=format&fit=crop&q=80",
-    dateAdded: "Aug 12, 2026"
-  },
-  {
-    id: "INV-005",
-    material: "E-Waste Mixed PCB",
-    category: "Electronic Waste",
-    weightKg: "1,200 kg",
-    weightRawKg: 1200,
-    qtyUnit: "1.2 MT",
-    qtyRawMT: 1.2,
-    condition: "Grade C",
-    location: "Secure Storage - S1",
-    expPriceMT: "₹95,000",
-    expPriceRaw: 95000,
-    totalValue: 114000,
-    status: "Available",
-    imageUrl: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=150&auto=format&fit=crop&q=80",
-    dateAdded: "Aug 13, 2026"
-  },
-  {
-    id: "INV-006",
-    material: "Cast Iron Borings",
-    category: "Steel",
-    weightKg: "18,000 kg",
-    weightRawKg: 18000,
-    qtyUnit: "18 MT",
-    qtyRawMT: 18,
-    condition: "Grade B",
-    location: "Warehouse D - Bay 4",
-    expPriceMT: "₹22,000",
-    expPriceRaw: 22000,
-    totalValue: 396000,
-    status: "Sold",
-    imageUrl: "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?w=150&auto=format&fit=crop&q=80",
-    dateAdded: "Aug 09, 2026"
-  },
-  {
-    id: "INV-007",
-    material: "Brass Turning Scrap",
-    category: "Copper",
-    weightKg: "2,100 kg",
-    weightRawKg: 2100,
-    qtyUnit: "2.1 MT",
-    qtyRawMT: 2.1,
-    condition: "Grade A",
-    location: "Warehouse B - Bay 3",
-    expPriceMT: "₹3,80,000",
-    expPriceRaw: 380000,
-    totalValue: 798000,
-    status: "Available",
-    imageUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=150&auto=format&fit=crop&q=80",
-    dateAdded: "Aug 14, 2026"
-  },
-  {
-    id: "INV-008",
-    material: "Rubber Conveyor Belt Scrap",
-    category: "Rubber",
-    weightKg: "4,200 kg",
-    weightRawKg: 4200,
-    qtyUnit: "4.2 MT",
-    qtyRawMT: 4.2,
-    condition: "Grade C",
-    location: "Warehouse C - Bay 5",
-    expPriceMT: "₹28,000",
-    expPriceRaw: 28000,
-    totalValue: 117600,
-    status: "Available",
-    imageUrl: "https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=150&auto=format&fit=crop&q=80",
-    dateAdded: "Aug 14, 2026"
-  }
-];
 
 // Helper styles for Category badges using SmartScrap design tokens
 const getCategoryStyle = (category) => {
@@ -219,9 +83,12 @@ const getStatusStyle = (status) => {
 };
 
 const ScrapInventory = () => {
-  // Inventory state
-  const [scrapList, setScrapList] = useState(INITIAL_SCRAP_DATA);
+  // Inventory state (dynamically fetched from database)
+  const [scrapList, setScrapList] = useState([]);
+
+  const [dbCategories, setDbCategories] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -243,6 +110,80 @@ const ScrapInventory = () => {
   const showToast = (msg) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(""), 3500);
+  };
+
+  useEffect(() => {
+    fetchScraps();
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await ApiService.getCategories();
+      if (res.data?.success && res.data.data) {
+        setDbCategories(res.data.data);
+      }
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
+  };
+
+  const fetchScraps = async () => {
+    try {
+      setIsLoading(true);
+      const res = await ApiService.getScraps();
+      if (res.data?.success && res.data.data && res.data.data.length > 0) {
+        const formatted = res.data.data.map((record) => {
+          const totalKg = Number(record.totalQuantityKg || 0);
+          const listedKg = Number(record.listedQuantityKg || 0);
+          const soldKg = Number(record.soldQuantityKg || 0);
+          const availKg = Number(record.availableQuantityKg || (totalKg - listedKg - soldKg));
+          const qtyRawMT = availKg / 1000;
+
+          let statusLabel = "Available";
+          if (record.status === "SOLD_OUT" || soldKg >= totalKg) {
+            statusLabel = "Sold";
+          } else if (record.status === "FULLY_LISTED" || listedKg >= totalKg) {
+            statusLabel = "Fully Listed";
+          } else if (record.status === "PARTIALLY_LISTED" || listedKg > 0) {
+            statusLabel = "Partially Listed";
+          }
+
+          return {
+            id: record.id,
+            material: record.description || record.category?.name || "Scrap Material",
+            category: record.category?.name || "General",
+            categoryId: record.categoryId,
+            weightKg: `${availKg.toLocaleString("en-IN")} kg`,
+            weightRawKg: availKg,
+            qtyUnit: `${qtyRawMT.toFixed(2)} MT`,
+            qtyRawMT: qtyRawMT,
+            condition: record.condition || "Grade A",
+            location: record.locationLabel || "Warehouse A",
+            expPriceMT: "₹35,000",
+            expPriceRaw: 35000,
+            totalValue: qtyRawMT * 35000,
+            status: statusLabel,
+            imageUrl:
+              record.images && record.images.length > 0
+                ? record.images[0].url
+                : "https://images.unsplash.com/photo-1535813547-99c456a41d4a?w=150&auto=format&fit=crop&q=80",
+            dateAdded: new Date(record.createdAt).toLocaleDateString("en-IN", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            }),
+            rawRecord: record,
+          };
+        });
+        setScrapList(formatted);
+      }
+    } catch (err) {
+      console.error("Error fetching scrap inventory:", err);
+    } finally {
+      setIsLoading(false);
+    }
+
   };
 
   // Metrics Calculation (dynamic) matching Dealer Dashboard stat cards
@@ -267,7 +208,7 @@ const ScrapInventory = () => {
       listed,
       sold,
       totalWeight: `${totalWeightMT.toFixed(1)} MT`,
-      estValue: `₹${totalValue.toLocaleString("en-IN")}`
+      estValue: `₹${totalValue.toLocaleString("en-IN")}`,
     };
   }, [scrapList]);
 
@@ -321,19 +262,61 @@ const ScrapInventory = () => {
   };
 
   // CRUD Operations
-  const handleAddScrap = (newLot) => {
+  const handleAddScrap = async (newLot) => {
+    try {
+      const payload = {
+        categoryId: newLot.categoryId || (dbCategories[0]?.id || undefined),
+        description: newLot.material,
+        totalQuantityKg: newLot.weightRawKg || 1000,
+        condition: newLot.condition,
+        locationLabel: newLot.location,
+      };
+      const res = await ApiService.createScrap(payload);
+      if (res.data?.success) {
+        showToast(`Successfully added ${newLot.material} to database inventory!`);
+        fetchScraps();
+        return;
+      }
+    } catch (err) {
+      console.error("Failed to add scrap to DB:", err);
+    }
     setScrapList((prev) => [newLot, ...prev]);
-    showToast(`Successfully added ${newLot.material} (${newLot.id})!`);
+    showToast(`Successfully added ${newLot.material}!`);
   };
 
-  const handleUpdateScrap = (updatedLot) => {
+  const handleUpdateScrap = async (updatedLot) => {
+    try {
+      if (updatedLot.rawRecord?.id) {
+        await ApiService.updateScrap(updatedLot.rawRecord.id, {
+          description: updatedLot.material,
+          totalQuantityKg: updatedLot.weightRawKg,
+          condition: updatedLot.condition,
+          locationLabel: updatedLot.location,
+        });
+        fetchScraps();
+        showToast(`Updated details for ${updatedLot.id}`);
+        return;
+      }
+    } catch (err) {
+      console.error("Failed to update scrap in DB:", err);
+    }
     setScrapList((prev) =>
       prev.map((item) => (item.id === updatedLot.id ? updatedLot : item))
     );
     showToast(`Updated details for ${updatedLot.id}`);
   };
 
-  const handleDeleteScrap = (item) => {
+  const handleDeleteScrap = async (item) => {
+    try {
+      if (item.rawRecord?.id) {
+        await ApiService.deleteScrap(item.rawRecord.id);
+        fetchScraps();
+        showToast(`Deleted ${item.id} from inventory database.`);
+        return;
+      }
+    } catch (err) {
+      console.error("Failed to delete scrap from DB:", err);
+    }
     setScrapList((prev) => prev.filter((i) => i.id !== item.id));
     setSelectedIds((prev) => prev.filter((id) => id !== item.id));
     setDeleteConfirmItem(null);
@@ -350,12 +333,13 @@ const ScrapInventory = () => {
       dateAdded: new Date().toLocaleDateString("en-IN", {
         month: "short",
         day: "numeric",
-        year: "numeric"
-      })
+        year: "numeric",
+      }),
     };
     setScrapList((prev) => [duplicated, ...prev]);
     showToast(`Duplicated ${item.id} as new lot ${duplicated.id}`);
   };
+
 
   const handleBulkDelete = () => {
     setScrapList((prev) => prev.filter((item) => !selectedIds.includes(item.id)));
@@ -650,10 +634,16 @@ const ScrapInventory = () => {
         <AddScrapModal
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
-          onAdd={handleAddScrap}
-          nextId={`INV-00${scrapList.length + 1}`}
+          onSuccess={() => {
+            fetchScraps();
+            showToast("Successfully added scrap item to inventory!");
+          }}
+          role="DEALER"
+          categories={dbCategories}
         />
       )}
+
+
 
       {/* ================= EDIT SCRAP MODAL ================= */}
       {editingItem && (
@@ -716,512 +706,6 @@ const ScrapInventory = () => {
 };
 
 // ================= SUB-MODAL COMPONENTS =================
-
-// Add Scrap Modal Component matching reference layout
-const AddScrapModal = ({ isOpen, onClose, onAdd, nextId }) => {
-  const fileInputRef = useRef(null);
-  const [formError, setFormError] = useState("");
-  const [formData, setFormData] = useState({
-    material: "",
-    category: "Select category",
-    description: "",
-    weightKg: "",
-    qtyUnit: "",
-    unit: "MT",
-    condition: "Select condition",
-    location: "",
-    expPriceMT: "",
-    remarks: "",
-    imageUrl: "",
-    publishSetting: "Direct Sale",
-    status: "Available"
-  });
-
-  if (!isOpen) return null;
-
-  const handleImageFileChange = (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setFormData((prev) => ({ ...prev, imageUrl: reader.result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleDropImage = (e) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files && e.dataTransfer.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setFormData((prev) => ({ ...prev, imageUrl: reader.result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = (e, isDraft = false) => {
-    if (e) e.preventDefault();
-    setFormError("");
-
-    if (!isDraft) {
-      if (
-        !formData.material.trim() ||
-        formData.category === "Select category" ||
-        !formData.weightKg.trim() ||
-        !formData.qtyUnit.trim() ||
-        formData.condition === "Select condition"
-      ) {
-        setFormError("Please fill in all required fields marked with *");
-        return;
-      }
-    }
-
-    const materialName = formData.material.trim() || "MS Steel HMS 1&2";
-    const categoryName =
-      formData.category === "Select category" ? "Steel" : formData.category;
-    const conditionName =
-      formData.condition === "Select condition" ? "Grade A" : formData.condition;
-
-    const rawWeight = parseFloat(formData.weightKg.replace(/,/g, "")) || 1000;
-    const rawQtyMT = parseFloat(formData.qtyUnit) || 1.0;
-    const rawPrice = parseFloat(formData.expPriceMT.replace(/[^0-9.]/g, "")) || 35000;
-
-    const newLot = {
-      id: nextId,
-      material: materialName,
-      category: categoryName,
-      weightKg: `${rawWeight.toLocaleString("en-IN")} kg`,
-      weightRawKg: rawWeight,
-      qtyUnit: `${rawQtyMT} ${formData.unit}`,
-      qtyRawMT: rawQtyMT,
-      condition: conditionName,
-      location: formData.location.trim() || "Warehouse A - Bay 3",
-      expPriceMT: `₹${rawPrice.toLocaleString("en-IN")}`,
-      expPriceRaw: rawPrice,
-      totalValue: rawQtyMT * rawPrice,
-      status: isDraft ? "Partially Listed" : "Available",
-      imageUrl:
-        formData.imageUrl ||
-        "https://images.unsplash.com/photo-1535813547-99c456a41d4a?w=150&auto=format&fit=crop&q=80",
-      dateAdded: new Date().toLocaleDateString("en-IN", {
-        month: "short",
-        day: "numeric",
-        year: "numeric"
-      })
-    };
-
-    onAdd(newLot);
-    onClose();
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity animate-in fade-in"
-        onClick={onClose}
-      />
-
-      {/* Right Side Slide-Over Drawer */}
-      <div className="relative w-full max-w-3xl bg-white h-full shadow-2xl p-4 sm:p-6 flex flex-col z-10 animate-in slide-in-from-right duration-200 border-l border-slate-200 text-left font-sans overflow-y-auto">
-        {/* Header Bar */}
-        <div className="flex items-center gap-3 mb-5 pb-3 border-b border-slate-200/60">
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer shrink-0"
-            title="Back"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </button>
-          <div>
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
-              Add New Scrap
-            </h2>
-            <p className="text-xs text-slate-500">
-              Fill in the details to add scrap to your inventory
-            </p>
-          </div>
-        </div>
-
-        <form onSubmit={(e) => handleSubmit(e, false)}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            {/* ================= LEFT MAIN FORM (2 Cols) ================= */}
-            <div className="lg:col-span-2 space-y-4">
-              {/* Card 1: Material Information */}
-              <div className="bg-white rounded-xl border border-slate-200/80 p-4 sm:p-5 shadow-xs space-y-4">
-                <h3 className="text-sm font-bold text-slate-900">
-                  Material Information
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Category */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Material Category *
-                    </label>
-                    <select
-                      value={formData.category}
-                      onChange={(e) =>
-                        setFormData({ ...formData, category: e.target.value })
-                      }
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                    >
-                      <option value="Select category">Select category</option>
-                      <option value="Steel">Steel</option>
-                      <option value="Copper">Copper</option>
-                      <option value="Aluminium">Aluminium</option>
-                      <option value="Plastic">Plastic</option>
-                      <option value="Electronic Waste">Electronic Waste</option>
-                      <option value="Rubber">Rubber</option>
-                    </select>
-                  </div>
-
-                  {/* Material Name */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Material Name *
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. MS Steel HMS 1&2"
-                      value={formData.material}
-                      onChange={(e) =>
-                        setFormData({ ...formData, material: e.target.value })
-                      }
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                    Description
-                  </label>
-                  <textarea
-                    rows={3}
-                    placeholder="Describe the material quality, origin, processing details..."
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                  ></textarea>
-                </div>
-              </div>
-
-              {/* Card 2: Quantity & Specifications */}
-              <div className="bg-white rounded-xl border border-slate-200/80 p-4 sm:p-5 shadow-xs space-y-4">
-                <h3 className="text-sm font-bold text-slate-900">
-                  Quantity & Specifications
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {/* Weight */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Weight (kg) *
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="24500"
-                      value={formData.weightKg}
-                      onChange={(e) =>
-                        setFormData({ ...formData, weightKg: e.target.value })
-                      }
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  {/* Quantity */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Quantity *
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="24.5"
-                      value={formData.qtyUnit}
-                      onChange={(e) =>
-                        setFormData({ ...formData, qtyUnit: e.target.value })
-                      }
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  {/* Unit */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Unit
-                    </label>
-                    <select
-                      value={formData.unit}
-                      onChange={(e) =>
-                        setFormData({ ...formData, unit: e.target.value })
-                      }
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                    >
-                      <option value="MT">MT</option>
-                      <option value="Kg">Kg</option>
-                      <option value="Tons">Tons</option>
-                      <option value="Pcs">Pcs</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {/* Condition / Grade */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Condition / Grade *
-                    </label>
-                    <select
-                      value={formData.condition}
-                      onChange={(e) =>
-                        setFormData({ ...formData, condition: e.target.value })
-                      }
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                    >
-                      <option value="Select condition">Select condition</option>
-                      <option value="Grade A">Grade A</option>
-                      <option value="Grade B">Grade B</option>
-                      <option value="Grade C">Grade C</option>
-                    </select>
-                  </div>
-
-                  {/* Warehouse Location */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Warehouse Location *
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Warehouse A - Bay 3"
-                      value={formData.location}
-                      onChange={(e) =>
-                        setFormData({ ...formData, location: e.target.value })
-                      }
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  {/* Expected Price */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Expected Price (₹/MT)
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="38500"
-                      value={formData.expPriceMT}
-                      onChange={(e) =>
-                        setFormData({ ...formData, expPriceMT: e.target.value })
-                      }
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 3: Additional Notes */}
-              <div className="bg-white rounded-xl border border-slate-200/80 p-4 sm:p-5 shadow-xs space-y-3">
-                <h3 className="text-sm font-bold text-slate-900">
-                  Additional Notes
-                </h3>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                    Remarks
-                  </label>
-                  <textarea
-                    rows={2.5}
-                    placeholder="Any special handling, storage requirements, certifications..."
-                    value={formData.remarks}
-                    onChange={(e) =>
-                      setFormData({ ...formData, remarks: e.target.value })
-                    }
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                  ></textarea>
-                </div>
-              </div>
-            </div>
-
-            {/* ================= RIGHT SIDEBAR (1 Col) ================= */}
-            <div className="space-y-4">
-              {/* Card 1: Material Images */}
-              <div className="bg-white rounded-xl border border-slate-200/80 p-4 sm:p-5 shadow-xs space-y-3">
-                <h3 className="text-sm font-bold text-slate-900">
-                  Material Images
-                </h3>
-
-                {/* Hidden File Input */}
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept="image/*"
-                  onChange={handleImageFileChange}
-                  className="hidden"
-                />
-
-                {/* Upload Preview or Upload Box */}
-                {formData.imageUrl ? (
-                  <div className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-50 p-2 space-y-2">
-                    <div className="h-36 w-full rounded-lg overflow-hidden relative border border-slate-200">
-                      <img
-                        src={formData.imageUrl}
-                        alt="Scrap Preview"
-                        className="w-full h-full object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setFormData((prev) => ({ ...prev, imageUrl: "" }))
-                        }
-                        className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/80 text-white hover:bg-rose-600 transition-colors cursor-pointer shadow-md"
-                        title="Remove image"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <div className="flex items-center justify-between px-1">
-                      <span className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Image attached
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="text-[11px] font-semibold text-blue-600 hover:underline cursor-pointer"
-                      >
-                        Change Image
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    onClick={() => fileInputRef.current?.click()}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={handleDropImage}
-                    className="border-2 border-dashed border-blue-200 bg-blue-50/20 rounded-xl p-5 text-center hover:bg-blue-50/50 transition-colors cursor-pointer group"
-                  >
-                    <Upload className="w-6 h-6 text-blue-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                    <p className="text-xs font-semibold text-slate-700">
-                      Drop images here or click to upload
-                    </p>
-                    <p className="text-[10px] text-slate-400 mt-1">
-                      PNG, JPG up to 10MB each
-                    </p>
-                  </div>
-                )}
-
-                {/* Image URL fallback input */}
-                <div>
-                  <input
-                    type="url"
-                    placeholder="Or paste image URL..."
-                    value={formData.imageUrl}
-                    onChange={(e) =>
-                      setFormData({ ...formData, imageUrl: e.target.value })
-                    }
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 mt-1"
-                  />
-                </div>
-              </div>
-
-              {/* Card 2: Publish Settings */}
-              <div className="bg-white rounded-xl border border-slate-200/80 p-4 sm:p-5 shadow-xs space-y-3">
-                <h3 className="text-sm font-bold text-slate-900">
-                  Publish Settings
-                </h3>
-
-                <div className="space-y-2.5 text-xs">
-                  {[
-                    {
-                      key: "Quotation",
-                      label: "Quotation",
-                      desc: "Receive & compare buyer quotes"
-                    },
-                    {
-                      key: "Auction",
-                      label: "Auction",
-                      desc: "Live competitive bidding"
-                    },
-                    {
-                      key: "Tender",
-                      label: "Tender",
-                      desc: "Sealed offer submission"
-                    },
-                    {
-                      key: "Direct Sale",
-                      label: "Direct Sale",
-                      desc: "Fixed price direct sale"
-                    }
-                  ].map((setting) => (
-                    <label
-                      key={setting.key}
-                      className="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
-                    >
-                      <input
-                        type="radio"
-                        name="publishSetting"
-                        value={setting.key}
-                        checked={formData.publishSetting === setting.key}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            publishSetting: e.target.value
-                          })
-                        }
-                        className="mt-0.5 w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
-                      />
-                      <div>
-                        <div className="font-bold text-slate-900">
-                          {setting.label}
-                        </div>
-                        <div className="text-[11px] text-slate-400">
-                          {setting.desc}
-                        </div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Action Buttons Stack */}
-              <div className="space-y-2 pt-1">
-                <button
-                  type="submit"
-                  className="w-full py-3 px-4 rounded-xl bg-primary hover:opacity-90 text-primary-foreground font-semibold text-xs flex items-center justify-center gap-2 shadow-sm transition-opacity cursor-pointer"
-                >
-                  <Send className="w-4 h-4" /> Publish to Marketplace
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleSubmit(null, true)}
-                  className="w-full py-2.5 px-4 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
-                >
-                  <Save className="w-4 h-4" /> Save as Draft
-                </button>
-
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="w-full py-2.5 px-4 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" /> Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
 
 // Edit Scrap Modal Component
 const EditScrapModal = ({ isOpen, item, onClose, onUpdate }) => {

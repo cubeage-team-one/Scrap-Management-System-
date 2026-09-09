@@ -9,6 +9,13 @@ import Loader from "../../components/common/Loader";
 import IndustryOnboardModal from "./industries/IndustryOnboardModal";
 import IndustryViewModal from "./industries/IndustryViewModal";
 import IndustryEditModal from "./industries/IndustryEditModal";
+import { updateIndustryStatus } from "../../core/services/industry.service";
+
+const STATUS_TO_BACKEND = {
+  Approved: "ACTIVE",
+  Pending: "PENDING",
+  Rejected: "REJECTED",
+};
 
 const EMPTY_FORM = {
   companyName: "",
@@ -44,11 +51,6 @@ export default function Industries() {
   // Form State
   const [formData, setFormData] = useState(EMPTY_FORM);
 
-  // Fetch industries data from API
-  useEffect(() => {
-    fetchIndustries();
-  }, []);
-
   const fetchIndustries = async () => {
     try {
       setLoading(true);
@@ -56,7 +58,8 @@ export default function Industries() {
 
       // Fetched once in full; MaterialTable owns search/filter/sort/pagination
       // client-side from here on, so there's no need to re-fetch on those.
-      const response = await ApiService.get("/admin/industries", {
+      const response = await ApiService.getIndustries({
+
         limit: 1000,
       });
 
@@ -94,6 +97,11 @@ export default function Industries() {
       setLoading(false);
     }
   };
+
+  // Fetch industries data from API
+  useEffect(() => {
+    Promise.resolve().then(fetchIndustries);
+  }, []);
 
   // Row selection state, adapted between MaterialTable's { [id]: true } shape
   // (used by Material React Table's built-in checkbox column) and the plain
@@ -201,8 +209,10 @@ export default function Industries() {
   };
 
   // Form submission: Edit — no backend endpoint exists yet for arbitrary
-  // field edits, so this stays local-only too.
-  const handleEditIndustry = (e) => {
+  // field edits, so those stay local-only. Status IS backed by a real
+  // endpoint though, so a status change made from this form is persisted
+  // for real instead of silently being lost on refresh.
+  const handleEditIndustry = async (e) => {
     e.preventDefault();
     if (!activeIndustry) return;
 
@@ -211,6 +221,18 @@ export default function Industries() {
       typeof formData.tradedValue === "string" && formData.tradedValue.startsWith("₹")
         ? formData.tradedValue
         : "₹" + rawVal.toLocaleString("en-IN");
+
+    if (formData.status !== activeIndustry.status) {
+      try {
+        await updateIndustryStatus(activeIndustry.id, {
+          accountState: STATUS_TO_BACKEND[formData.status],
+        });
+      } catch (err) {
+        console.error("Failed to update industry status:", err);
+        alert(err.response?.data?.message || "Failed to update industry status.");
+        return;
+      }
+    }
 
     setIndustries((prev) =>
       prev.map((item) =>
@@ -236,11 +258,18 @@ export default function Industries() {
     setActiveIndustry(null);
   };
 
-  // MaterialTable shows its own confirmation dialog before calling this, so
-  // no separate confirm step is needed here.
-  const handleDeleteIndustry = (industry) => {
-    setIndustries((prev) => prev.filter((item) => item.id !== industry.id));
-    setSelectedRows((prev) => prev.filter((id) => id !== industry.id));
+  // Approve/Reject/Set-Pending — wired to the real admin status endpoint.
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      await updateIndustryStatus(id, { accountState: STATUS_TO_BACKEND[newStatus] });
+      setIndustries((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
+      );
+      setActiveIndustry((prev) => (prev && prev.id === id ? { ...prev, status: newStatus } : prev));
+    } catch (err) {
+      console.error("Failed to update industry status:", err);
+      alert(err.response?.data?.message || "Failed to update industry status.");
+    }
   };
 
   const openEditModal = (industry) => {
@@ -336,7 +365,6 @@ export default function Industries() {
               setIsViewModalOpen(true);
             }}
             onEdit={openEditModal}
-            onDelete={handleDeleteIndustry}
             enableRowSelection
             rowSelection={rowSelection}
             onRowSelectionChange={handleRowSelectionChange}
@@ -356,6 +384,7 @@ export default function Industries() {
         isOpen={isViewModalOpen}
         industry={activeIndustry}
         onClose={() => setIsViewModalOpen(false)}
+        onStatusChange={handleStatusChange}
       />
 
       <IndustryEditModal
