@@ -75,9 +75,14 @@ export const sidebarMenus = {
       path: RoutePath.INDUSTRY_MY_SCRAP,
     },
     {
-      label: "Inventory",
+      label: "My Listings",
       icon: Package,
-      path: RoutePath.INDUSTRY_INVENTORY,
+      path: RoutePath.INDUSTRY_LISTINGS,
+    },
+    {
+      label: "Quotations",
+      icon: Package,
+      path: RoutePath.INDUSTRY_QUOTATIONS,
     },
     {
       label: "Marketplace",
@@ -89,12 +94,6 @@ export const sidebarMenus = {
       icon: Package,
       path: RoutePath.INDUSTRY_AUCTIONS,
     },
-    {
-      label: "Quotations",
-      icon: Package,
-      path: RoutePath.INDUSTRY_QUOTATIONS,
-    },
-
     {
       label: "Sales Orders",
       icon: Package,
@@ -144,55 +143,44 @@ export const sidebarMenus = {
       path: RoutePath.DEALER_LIVE_AUCTIONS,
     },
 
-     {
-      label: "Bids",
-      icon: Package,
-      path: RoutePath.DEALER_MY_BIDS,
-    },
-
-     {
+    {
       label: "Won Auctions",
       icon: Package,
       path: RoutePath.DEALER_WON_AUCTIONS,
     },
 
-     {
-      label: "Purchased Scrap",
-      icon: Package,
-      path: RoutePath.DEALER_PURCHASED_SCRAP,
-    },
-
-     {
+    {
       label: "Scrap Inventory",
       icon: Package,
       path: RoutePath.DEALER_SCRAP_INVENTORY,
     },
 
-     {
+    {
       label: "Orders",
       icon: Package,
       path: RoutePath.DEALER_ORDERS,
     },
 
-     {
+    {
       label: "Reports",
       icon: Package,
       path: RoutePath.DEALER_REPORTS,
     },
 
-     {
+    {
       label: "Notifications",
       icon: Package,
       path: RoutePath.DEALER_NOTIFICATIONS,
     },
 
-     {
+    {
       label: "Settings",
       icon: Package,
       path: RoutePath.DEALER_SETTINGS,
     },
 
   ],
+
 
   [USER_ROLES.BUYER]: [
     {
@@ -204,6 +192,11 @@ export const sidebarMenus = {
       label: "Marketplace",
       icon: ShoppingCart,
       path: RoutePath.BUYER_MARKETPLACE,
+    },
+    {
+      label: "Quotations",
+      icon: Package,
+      path: RoutePath.BUYER_QUOTATIONS,
     },
     {
       label: "Reports",

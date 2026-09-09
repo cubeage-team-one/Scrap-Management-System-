@@ -75,11 +75,6 @@ const Buyers = () => {
     status: "Pending",
   });
 
-  // Fetch buyers from the real admin endpoint
-  useEffect(() => {
-    fetchBuyers();
-  }, [page, filters.status, search]);
-
   const fetchBuyers = async () => {
     try {
       setLoading(true);
@@ -129,6 +124,11 @@ const Buyers = () => {
     }
   };
 
+  // Fetch buyers from the real admin endpoint
+  useEffect(() => {
+    Promise.resolve().then(fetchBuyers);
+  }, [page, filters.status, search]);
+
   // Dynamic Location List
   const locationsList = useMemo(() => {
     return ["All locations", ...new Set(buyers.map((b) => b.location))];
@@ -174,7 +174,7 @@ const Buyers = () => {
   const handleApproveSelected = async () => {
     try {
       await Promise.all(
-        selected.map((id) => ApiService.updateBuyerStatus(id, { accountState: "ACTIVE" }))
+        selected.map((id) => updateBuyerStatus(id, { accountState: "ACTIVE" }))
       );
       setSelected([]);
       fetchBuyers();
@@ -187,7 +187,7 @@ const Buyers = () => {
   const handleRejectSelected = async () => {
     try {
       await Promise.all(
-        selected.map((id) => ApiService.updateBuyerStatus(id, { accountState: "REJECTED" }))
+        selected.map((id) => updateBuyerStatus(id, { accountState: "REJECTED" }))
       );
       setSelected([]);
       fetchBuyers();
@@ -213,10 +213,26 @@ const Buyers = () => {
   };
 
   // Edit modal save — no backend endpoint exists yet to update arbitrary
-  // buyer org fields (only approve/reject status), so this stays local-only.
-  const handleSaveEdit = (e) => {
+  // buyer org fields, so those stay local-only. Status IS backed by a real
+  // endpoint though, so a status change made from this form is persisted
+  // for real instead of silently being lost on refresh.
+  const handleSaveEdit = async (e) => {
     e.preventDefault();
     if (!editBuyer) return;
+
+    const original = buyers.find((b) => b.id === editBuyer.id);
+    if (original && editBuyer.status !== original.status) {
+      try {
+        await updateBuyerStatus(editBuyer.id, {
+          accountState: STATUS_TO_BACKEND[editBuyer.status],
+        });
+      } catch (err) {
+        console.error("Failed to update buyer status:", err);
+        alert(err.response?.data?.message || "Failed to update buyer status.");
+        return;
+      }
+    }
+
     setBuyers((prev) => prev.map((b) => (b.id === editBuyer.id ? editBuyer : b)));
     setEditBuyer(null);
   };

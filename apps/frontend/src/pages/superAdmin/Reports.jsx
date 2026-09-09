@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Download,
@@ -19,7 +19,6 @@ import {
   Share2,
   Printer,
   Layers,
-  Building2,
   Sparkles,
   ArrowUpRight,
   CheckCircle2,
@@ -35,10 +34,15 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
-  ComposedChart,
-  Line,
 } from "recharts";
+
+import MaterialTable from "../../components/common/MaterialTable";
+import ApiService from "../../core/services/api.service";
+import {
+  inventoryReportColumns,
+  industryPerformanceColumns,
+} from "../../configs/tables/reportsTable.config";
+
 
 // --- Mock Data Matching the Reference Screen ---
 
@@ -141,9 +145,26 @@ const CustomMaterialsTooltip = ({ active, payload }) => {
 
 const Reports = () => {
   const [activeTab, setActiveTab] = useState("Sales");
+
+  const [adminReportData, setAdminReportData] = useState(null);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+
+  useEffect(() => {
+    fetchAdminReports();
+  }, []);
+
+  const fetchAdminReports = async () => {
+    try {
+      const res = await ApiService.getAdminReports();
+      if (res.data?.success) {
+        setAdminReportData(res.data.data);
+      }
+    } catch (err) {
+      console.error("Error fetching admin reports:", err);
+    }
+  };
 
   // Schedule Modal Form State
   const [scheduleForm, setScheduleForm] = useState({
@@ -161,6 +182,7 @@ const Reports = () => {
       setToastMessage("");
     }, 4000);
   };
+
 
   const handleExportPDF = () => {
     setIsExporting(true);
@@ -501,51 +523,7 @@ const Reports = () => {
                   12,846 MT Total
                 </span>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="text-xs text-muted-foreground uppercase border-b border-border bg-muted/50">
-                    <tr>
-                      <th className="py-2.5 px-3">Category</th>
-                      <th className="py-2.5 px-3">Current Stock</th>
-                      <th className="py-2.5 px-3">Capacity</th>
-                      <th className="py-2.5 px-3">Avg. Turnaround</th>
-                      <th className="py-2.5 px-3 text-right">Occupancy</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {inventoryData.map((item, idx) => {
-                      const pct = Math.round((item.stock / item.capacity) * 100);
-                      return (
-                        <tr key={idx} className="hover:bg-muted/50 transition-colors">
-                          <td className="py-3 px-3 font-medium text-foreground">
-                            {item.category}
-                          </td>
-                          <td className="py-3 px-3 text-muted-foreground">{item.stock.toLocaleString()} MT</td>
-                          <td className="py-3 px-3 text-muted-foreground/70">{item.capacity.toLocaleString()} MT</td>
-                          <td className="py-3 px-3">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-muted text-foreground">
-                              {item.turnaround}
-                            </span>
-                          </td>
-                          <td className="py-3 px-3 text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <span className="text-xs font-semibold text-foreground">{pct}%</span>
-                              <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                                <div
-                                  className={`h-full rounded-full ${
-                                    pct > 85 ? "bg-amber-500" : "bg-emerald-500"
-                                  }`}
-                                  style={{ width: `${pct}%` }}
-                                />
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <MaterialTable columns={inventoryReportColumns} data={inventoryData} />
             </div>
 
             <div className="lg:col-span-5 bg-card rounded-xl border border-border p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
@@ -753,41 +731,7 @@ const Reports = () => {
               </span>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="text-xs text-muted-foreground uppercase border-b border-border bg-muted/50">
-                  <tr>
-                    <th className="py-2.5 px-3">Industry Sector</th>
-                    <th className="py-2.5 px-3">Volume Dispatched</th>
-                    <th className="py-2.5 px-3">Gross Realized Value</th>
-                    <th className="py-2.5 px-3">Fulfillment Score</th>
-                    <th className="py-2.5 px-3 text-right">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {industryPerformanceData.map((item, idx) => (
-                    <tr key={idx} className="hover:bg-muted/50 transition-colors">
-                      <td className="py-3 px-3 font-medium text-foreground flex items-center gap-2">
-                        <Building2 className="w-4 h-4 text-primary" />
-                        {item.name}
-                      </td>
-                      <td className="py-3 px-3 text-muted-foreground">{item.volume.toLocaleString()} MT</td>
-                      <td className="py-3 px-3 font-semibold text-foreground">{item.value}</td>
-                      <td className="py-3 px-3">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700">
-                          {item.fulfillment}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 text-right">
-                        <span className="text-xs font-medium text-primary hover:underline cursor-pointer">
-                          View Drilldown
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <MaterialTable columns={industryPerformanceColumns} data={industryPerformanceData} />
           </div>
         )}
 

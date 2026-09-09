@@ -10,6 +10,13 @@ router.use(auth);
 router.use(allowRoles("SUPER_ADMIN"));
 
 // =========================================================
+// DASHBOARD ANALYTICS
+// =========================================================
+
+// GET /admin/dashboard - Get dashboard analytics
+router.get("/dashboard", AdminController.getDashboardAnalytics);
+
+// =========================================================
 // INDUSTRIES ROUTES
 // =========================================================
 

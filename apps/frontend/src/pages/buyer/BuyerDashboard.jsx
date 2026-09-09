@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import {
   Package,
   FileText,
@@ -9,6 +10,7 @@ import {
   TrendingUp,
   TrendingDown,
 } from "lucide-react";
+
 import {
   Area,
   AreaChart,
@@ -143,6 +145,9 @@ const ListRow = ({ item }) => (
 );
 
 const BuyerDashboard = () => {
+  const navigate = useNavigate();
+
+
   return (
     <section>
       {/* Breadcrumb */}
@@ -168,18 +173,21 @@ const BuyerDashboard = () => {
         <div className="flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
-            className="px-4 py-2 text-sm font-semibold rounded-lg border shadow-sm transition-colors bg-secondary text-secondary-foreground border-border hover:bg-accent hover:text-accent-foreground"
+            onClick={() => navigate("/buyer/quotations")}
+            className="px-4 py-2 text-sm font-semibold rounded-lg border shadow-sm transition-colors bg-secondary text-secondary-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer"
           >
             My quotations
           </button>
           <button
             type="button"
-            className="px-4 py-2 text-sm font-semibold rounded-lg shadow-sm transition-opacity bg-primary text-primary-foreground hover:opacity-90"
+            onClick={() => navigate("/buyer/marketplace")}
+            className="px-4 py-2 text-sm font-semibold rounded-lg shadow-sm transition-opacity bg-primary text-primary-foreground hover:opacity-90 cursor-pointer"
           >
             Browse marketplace
           </button>
         </div>
       </div>
+
 
       {/* KPI cards */}
       <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-2 lg:grid-cols-3">

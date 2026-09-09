@@ -77,3 +77,22 @@ export const deleteScrap = async (req, res) => {
     res.status(error.statusCode || 400).json({ success: false, message: error.message });
   }
 };
+
+// 6. Import Purchased Sale to Inventory
+export const importSaleToInventory = async (req, res) => {
+  try {
+    const userId = req.user.id || req.user.userId;
+    const organisationId = req.user.organisationId;
+    const { saleId } = req.params;
+
+    if (!organisationId) {
+      return res.status(403).json({ success: false, message: 'User must belong to an organisation' });
+    }
+
+    const scrap = await scrapService.convertSaleToInventory(saleId, organisationId, userId);
+    res.status(201).json({ success: true, data: scrap, message: 'Sale imported to inventory successfully' });
+  } catch (error) {
+    console.error('Error importing sale to inventory:', error);
+    res.status(error.statusCode || 400).json({ success: false, message: error.message });
+  }
+};

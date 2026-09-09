@@ -17,6 +17,7 @@ import AddScrapModal from "../../components/industry/AddScrapModal";
 import LiveBidsModal from "../../components/industry/LiveBidsModal";
 import MaterialTable from "../../components/common/MaterialTable";
 import { industryTableConfig } from "../../configs/tables/industryTable.config";
+import { recentTransactionsColumns } from "../../configs/tables/recentTransactionsTable.config";
 
 const initialStockData = [
   {
@@ -688,40 +689,11 @@ const IndustryDashboard = () => {
               </button>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-amber-50/50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-100">
-                  <tr>
-                    <th className="px-4 py-3">SALE ID</th>
-                    <th className="px-4 py-3">MATERIAL</th>
-                    <th className="px-4 py-3">BUYER</th>
-                    <th className="px-4 py-3">VALUE</th>
-                    <th className="px-4 py-3">STATUS</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-medium">
-                  {transactions.map((tx) => (
-                    <tr key={tx.id} className="hover:bg-slate-50/80">
-                      <td className="px-4 py-3 font-semibold text-slate-800">{tx.id}</td>
-                      <td className="px-4 py-3 font-bold text-slate-900">{tx.material}</td>
-                      <td className="px-4 py-3 text-slate-600">{tx.buyer}</td>
-                      <td className="px-4 py-3 font-extrabold text-slate-900">{tx.value}</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                          tx.status === "Completed"
-                            ? "bg-emerald-100 text-emerald-800"
-                            : tx.status === "Pending"
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-rose-100 text-rose-800"
-                        }`}>
-                          {tx.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <MaterialTable
+              columns={recentTransactionsColumns}
+              data={transactions}
+              getRowId={(row) => row.id}
+            />
           </div>
         </div>
 

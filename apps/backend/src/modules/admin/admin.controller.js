@@ -257,6 +257,32 @@ class AdminController {
       });
     }
   }
+
+  // =========================================================
+  // DASHBOARD ANALYTICS
+  // =========================================================
+
+  /**
+   * Get dashboard analytics data
+   * GET /admin/dashboard
+   */
+  static async getDashboardAnalytics(req, res) {
+    try {
+      const analytics = await AdminService.getDashboardAnalytics();
+
+      return res.status(200).json({
+        success: true,
+        data: analytics,
+      });
+    } catch (error) {
+      console.error("[AdminController.getDashboardAnalytics]", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch dashboard analytics",
+        error: error.message,
+      });
+    }
+  }
 }
 
 export default AdminController;

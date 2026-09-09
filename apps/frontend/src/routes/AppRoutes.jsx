@@ -34,15 +34,19 @@ import Settings from "../pages/superAdmin/Settings";
 import IndustryDashboard from "../pages/industry/IndustryDashboard";
 import MyScrap from "../pages/industry/MyScrap";
 import IndustryInventory from "../pages/industry/IndustryInventory";
+import MyListings from "../pages/industry/MyListings";
 import IndustrySettings from "../pages/industry/Settings";
 import IndustryAuctions from "../pages/industry/IndustryAuctions";
 import IndustryMarketplace from "../pages/industry/IndustryMarketplace";
 import IndustryNotification from "../pages/industry/Notification";
+import IndustryQuotation from "../pages/industry/Quotation";
 // import IndustryReports from "../pages/industry/Reports";
 
 // Dealer
 import DealerDashboard from "../pages/dealer/DealerDashboard";
 import DealerProfile from "../pages/dealer/Profile";
+import DealerMarketplace from "../pages/dealer/DealerMarketplace";
+import SubmitQuotation from "../pages/dealer/SubmitQuotation";
 import PurchasedScrap from "../pages/dealer/PurchasedScrap";
 import ScrapInventory from "../pages/dealer/ScrapInventory";
 import LiveAuctions from "../pages/dealer/LiveAuction";
@@ -57,6 +61,9 @@ import Notification from "../pages/dealer/Notification";
 import BuyerDashboard from "../pages/buyer/BuyerDashboard";
 import BuyerProfile from "../pages/buyer/Profile";
 import BuyerReports from "../pages/buyer/BuyerReports";
+import BuyerMarketplace from "../pages/buyer/BuyerMarketplace";
+import BuyerSubmitQuotation from "../pages/buyer/SubmitQuotation";
+import BuyerQuotation from "../pages/buyer/BuyerQuotation";
 
 const AppRoutes = () => {
   return (
@@ -163,6 +170,16 @@ const AppRoutes = () => {
           />
 
           <Route
+            path={RoutePath.INDUSTRY_LISTINGS}
+            element={<MyListings />}
+          />
+
+          <Route
+            path={RoutePath.INDUSTRY_QUOTATIONS}
+            element={<IndustryQuotation />}
+          />
+
+          <Route
             path={RoutePath.INDUSTRY_SETTINGS}
             element={<IndustrySettings />}
           />
@@ -205,6 +222,21 @@ const AppRoutes = () => {
           />
 
            <Route
+            path={RoutePath.DEALER_MARKETPLACE}
+            element={<DealerMarketplace />}
+          />
+
+           <Route
+            path="/dealer/submit-quotation"
+            element={<SubmitQuotation />}
+          />
+
+           <Route
+            path={RoutePath.DEALER_QUOTATIONS}
+            element={<DealerQuotation />}
+          />
+
+           <Route
             path={RoutePath.DEALER_PURCHASED_SCRAP}
             element={<PurchasedScrap />}
           />
@@ -239,11 +271,6 @@ const AppRoutes = () => {
             element={<DealerReports />}
           />
 
-             <Route
-            path={RoutePath.DEALER_QUOTATIONS}
-            element={<DealerQuotation />}
-          />
-
             <Route
             path={RoutePath.DEALER_NOTIFICATIONS}
             element={<Notification/>}
@@ -262,6 +289,21 @@ const AppRoutes = () => {
           <Route
             path={RoutePath.BUYER_DASHBOARD}
             element={<BuyerDashboard />}
+          />
+
+           <Route
+            path={RoutePath.BUYER_MARKETPLACE}
+            element={<BuyerMarketplace />}
+          />
+
+           <Route
+            path="/buyer/submit-quotation"
+            element={<BuyerSubmitQuotation />}
+          />
+
+           <Route
+            path={RoutePath.BUYER_QUOTATIONS}
+            element={<BuyerQuotation />}
           />
 
            <Route

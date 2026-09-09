@@ -92,6 +92,30 @@ class ApiService {
     );
   }
 
+  /**
+   * Category Management
+   */
+  static createCategory(data) {
+    return this.axiosInstance.post(
+      ServerUrl.API_CREATE_CATEGORY,
+      data
+    );
+  }
+
+  static updateCategory(id, data) {
+    return this.axiosInstance.patch(
+      ServerUrl.API_UPDATE_CATEGORY(id),
+      data
+    );
+  }
+
+  static deleteCategory(id) {
+    return this.axiosInstance.delete(
+      ServerUrl.API_DELETE_CATEGORY(id)
+    );
+  }
+
+
   // =========================================================
   // ADMIN MANAGEMENT
   // =========================================================
@@ -150,9 +174,88 @@ class ApiService {
     );
   }
 
+  // =========================================================
+  // MARKETPLACE LISTINGS
+  // =========================================================
+
+  static getListings(params = {}) {
+    return this.axiosInstance.get(ServerUrl.API_GET_LISTINGS, { params });
+  }
+
+  static getListingById(id) {
+    return this.axiosInstance.get(ServerUrl.API_GET_LISTING_BY_ID(id));
+  }
+
+  static createListing(data) {
+    return this.axiosInstance.post(ServerUrl.API_CREATE_LISTING, data);
+  }
+
+  // =========================================================
+  // MARKETPLACE QUOTATIONS
+  // =========================================================
+
+  static getQuotations(params = {}) {
+    return this.axiosInstance.get(ServerUrl.API_GET_QUOTATIONS, { params });
+  }
+
+  static getQuotationById(id) {
+    return this.axiosInstance.get(ServerUrl.API_GET_QUOTATION_BY_ID(id));
+  }
+
+  static createQuotation(data) {
+    return this.axiosInstance.post(ServerUrl.API_CREATE_QUOTATION, data);
+  }
+
+  static acceptQuotation(id) {
+    return this.axiosInstance.patch(ServerUrl.API_ACCEPT_QUOTATION(id));
+  }
+
+  static rejectQuotation(id) {
+    return this.axiosInstance.patch(ServerUrl.API_REJECT_QUOTATION(id));
+  }
+
+  static withdrawQuotation(id) {
+    return this.axiosInstance.patch(ServerUrl.API_WITHDRAW_QUOTATION(id));
+  }
+
+  // =========================================================
+  // ADMIN DASHBOARD
+  // =========================================================
+
+  static getAdminDashboard() {
+    return this.axiosInstance.get(ServerUrl.API_ADMIN_DASHBOARD);
+  }
+
+  // =========================================================
+  // IMPORT SALE & REPORTS
+  // =========================================================
+
+
+  static importSaleToInventory(saleId) {
+    return this.axiosInstance.post(
+      ServerUrl.API_IMPORT_SALE_TO_INVENTORY(saleId)
+    );
+  }
+
+  static getIndustryReports() {
+    return this.axiosInstance.get(ServerUrl.API_GET_INDUSTRY_REPORTS);
+  }
+
+  static getDealerReports() {
+    return this.axiosInstance.get(ServerUrl.API_GET_DEALER_REPORTS);
+  }
+
+  static getBuyerReports() {
+    return this.axiosInstance.get(ServerUrl.API_GET_BUYER_REPORTS);
+  }
+
+  static getAdminReports() {
+    return this.axiosInstance.get(ServerUrl.API_GET_ADMIN_REPORTS);
+  }
 
   // =========================================================
   // CATEGORY
+
   // =========================================================
 
   static getCategories(params = {}) {

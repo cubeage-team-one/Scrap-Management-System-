@@ -24,4 +24,8 @@ router.put('/:id', allowRoles('INDUSTRY', 'DEALER'), validateUpdateScrap, scrapC
 // 5. Delete Scrap
 router.delete('/:id', allowRoles('INDUSTRY', 'DEALER'), scrapController.deleteScrap);
 
+// 6. Import Purchased Sale to Inventory
+router.post('/import-sale/:saleId', allowRoles('DEALER', 'BUYER'), scrapController.importSaleToInventory);
+
 export default router;
+

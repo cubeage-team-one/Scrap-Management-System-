@@ -83,11 +83,21 @@ class ServerUrl {
   static API_GET_CATEGORY_BY_ID = (id) =>
     `${ServerUrl.API_MODULE_CATEGORY}/${id}`;
 
+  static API_CREATE_CATEGORY =
+    `${ServerUrl.API_MODULE_CATEGORY}`;
+
+  static API_UPDATE_CATEGORY = (id) =>
+    `${ServerUrl.API_MODULE_CATEGORY}/${id}`;
+
+  static API_DELETE_CATEGORY = (id) =>
+    `${ServerUrl.API_MODULE_CATEGORY}/${id}`;
+
+
   // =========================================================
   // LISTING
   // =========================================================
 
-  static API_MODULE_LISTING = "listing";
+  static API_MODULE_LISTING = "marketplace/listings";
 
   static API_GET_LISTINGS =
     `${ServerUrl.API_MODULE_LISTING}`;
@@ -101,6 +111,9 @@ class ServerUrl {
   static API_UPDATE_LISTING = (id) =>
     `${ServerUrl.API_MODULE_LISTING}/${id}`;
 
+  static API_PUBLISH_LISTING = (id) =>
+    `${ServerUrl.API_MODULE_LISTING}/${id}/publish`;
+
   static API_DELETE_LISTING = (id) =>
     `${ServerUrl.API_MODULE_LISTING}/${id}`;
 
@@ -108,7 +121,7 @@ class ServerUrl {
   // QUOTATION
   // =========================================================
 
-  static API_MODULE_QUOTATION = "quotation";
+  static API_MODULE_QUOTATION = "marketplace/quotations";
 
   static API_GET_QUOTATIONS =
     `${ServerUrl.API_MODULE_QUOTATION}`;
@@ -118,6 +131,15 @@ class ServerUrl {
 
   static API_CREATE_QUOTATION =
     `${ServerUrl.API_MODULE_QUOTATION}`;
+
+  static API_ACCEPT_QUOTATION = (id) =>
+    `${ServerUrl.API_MODULE_QUOTATION}/${id}/accept`;
+
+  static API_REJECT_QUOTATION = (id) =>
+    `${ServerUrl.API_MODULE_QUOTATION}/${id}/reject`;
+
+  static API_WITHDRAW_QUOTATION = (id) =>
+    `${ServerUrl.API_MODULE_QUOTATION}/${id}/withdraw`;
 
   // =========================================================
   // AUCTION
@@ -196,6 +218,17 @@ class ServerUrl {
 
   static API_UPDATE_BUYER_STATUS = (id) =>
     `${ServerUrl.API_MODULE_ADMIN_MGMT}/buyers/${id}/status`;
+
+  // Import sale to inventory
+  static API_IMPORT_SALE_TO_INVENTORY = (saleId) =>
+    `${ServerUrl.API_MODULE_SCRAP}/import-sale/${saleId}`;
+
+  // Reports
+  static API_MODULE_REPORTS = "reports";
+  static API_GET_INDUSTRY_REPORTS = `${ServerUrl.API_MODULE_REPORTS}/industry`;
+  static API_GET_DEALER_REPORTS = `${ServerUrl.API_MODULE_REPORTS}/dealer`;
+  static API_GET_BUYER_REPORTS = `${ServerUrl.API_MODULE_REPORTS}/buyer`;
+  static API_GET_ADMIN_REPORTS = `${ServerUrl.API_MODULE_REPORTS}/admin`;
 }
 
 export default ServerUrl;
